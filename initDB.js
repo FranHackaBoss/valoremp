@@ -1,4 +1,7 @@
+const faker = require("faker");
+const lodash = require("lodash");
 const getDB = require("./db");
+const { formatDateToDB } = require("./helpers");
 
 let connection;
 
@@ -27,17 +30,6 @@ async function main() {
             );
         `)
 
-        //Creamos tabla fotos
-
-        await connection.query(`
-            CREATE TABLE ressource_image_data (
-                id INT AUTO_INCREMENT,
-                image_width INT NOT NULL,
-                image_height INT NOT NULL,
-                PRIMARY KEY (id)
-            );
-        `)
-
         //Creamos tabla company
         
         await connection.query(`
@@ -45,14 +37,10 @@ async function main() {
                 id BIGINT AUTO_INCREMENT,
                 name VARCHAR(128) NOT NULL,
                 description VARCHAR(2048),
+                logo VARCHAR(256),
                 email VARCHAR(256) NOT NULL,
-                computed_score FLOAT,
                 city VARCHAR(128),
-                logo_id INT UNIQUE,
-                PRIMARY KEY (id),
-                FOREIGN KEY (logo_id)
-                    REFERENCES ressource_image_data(id)
-                    ON DELETE CASCADE
+                PRIMARY KEY (id)
             );
         `);
 
@@ -65,19 +53,15 @@ async function main() {
                 surname_1 VARCHAR(128) NOT NULL,
                 surname_2 VARCHAR(128) NOT NULL,
                 bio VARCHAR(2048),
+                photo VARCHAR(256),
                 city VARCHAR(128),
                 email VARCHAR(256) NOT NULL UNIQUE,
                 username VARCHAR(128) NOT NULL UNIQUE,
                 password VARCHAR(512) NOT NULL,
-                photo_id INT UNIQUE,
-                PRIMARY KEY (id),
-                FOREIGN KEY (photo_id)
-                    REFERENCES ressource_image_data(id)
-                    ON DELETE CASCADE
+                PRIMARY KEY (id)
             );
         `);
         
-
         //Creamos tabla usuario-sesión
 
         await connection.query(`
@@ -96,11 +80,11 @@ async function main() {
             );
         `);
 
-
         //Creamos tabla usuario-companía
+
         await connection.query(`
             CREATE TABLE IF NOT EXISTS user_company (
-                id BIGINT NOT NULL AUTO_INCREMENT,
+                id BIGINT AUTO_INCREMENT,
                 company_id BIGINT NOT NULL,
                 user_id BIGINT NOT NULL,
                 erd_work_position VARCHAR(255) NULL,
@@ -115,7 +99,6 @@ async function main() {
                     ON DELETE CASCADE
             );
         `)
-
 
         //Creamos tabla company_aspects
         
@@ -140,11 +123,13 @@ async function main() {
                 id BIGINT UNIQUE NOT NULL,
                 user_id BIGINT,
                 company_id BIGINT,
+                evaluation_date DATETIME NOT NULL,
+                starting_date DATE NOT NULL,
+                end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 company_aspects_id BIGINT UNIQUE,
                 aspect1_points TINYINT NOT NULL,
                 aspect2_points TINYINT NOT NULL,
                 aspect3_points TINYINT NOT NULL,
-                evaluation_date DATETIME NOT NULL,
                 text_review VARCHAR(2048) NULL,
                 PRIMARY KEY (id),
                 FOREIGN KEY (user_id)
@@ -156,12 +141,46 @@ async function main() {
                 FOREIGN KEY (company_aspects_id)
                     REFERENCES company_aspects(id)
                     ON DELETE CASCADE,
-                CONSTRAINT evaluation CHECK ((aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
+                CONSTRAINT evaluation CHECK ((starting_date < end_date) AND (aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
             );
         `);
 
 
         console.log('Tablas creadas');
+
+        //Introducir datos de prueba
+
+
+        //Introducimos sesiones
+        const entries = 10;
+
+        for (let i = 0; i < entries; i++) {
+            const now = new Date();
+
+            await connection.query(`
+                INSERT INTO session(device, connection_date)
+                VALUES ('DESKTOP', '${formatDateToDB(now)}');
+            `)
+        }
+        
+        //Introducimos companies
+
+        for (let i = 0; i < entries; i++) {
+            await connection.query(`
+                INSERT INTO company(name, description, logo, email, city)
+                VALUES ('${faker.company.companyName()}','${faker.company.catchPhraseDescriptor()}', '${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
+            `)
+        }
+
+        //Introducimos usuarios
+
+        for (let i = 0; i < entries; i++) {
+            await connection.query(`
+                INSERT INTO user(name, surname_1, surname_2, bio, photo, city, email, username, password)
+                VALUES ('${faker.name.firstName()}', '${faker.name.lastName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.random.word()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.internet.password()}');
+            `)
+        }
+
     } catch(error) {
         console.error(error);
         } finally {
