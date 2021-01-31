@@ -1,5 +1,5 @@
 const faker = require("faker");
-const lodash = require("lodash");
+const { random } = require("lodash");
 const getDB = require("./db");
 const { formatDateToDB } = require("./helpers");
 
@@ -34,12 +34,12 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE company (
-                id BIGINT AUTO_INCREMENT,
-                name VARCHAR(128) NOT NULL,
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                name VARCHAR(256) NOT NULL,
                 description VARCHAR(2048),
                 logo VARCHAR(256),
                 email VARCHAR(256) NOT NULL,
-                city VARCHAR(128),
+                city VARCHAR(256),
                 PRIMARY KEY (id)
             );
         `);
@@ -48,8 +48,8 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE user (
-                id BIGINT AUTO_INCREMENT,
-                name VARCHAR(169) NOT NULL,
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                name VARCHAR(128) NOT NULL,
                 surname_1 VARCHAR(128) NOT NULL,
                 surname_2 VARCHAR(128) NOT NULL,
                 bio VARCHAR(2048),
@@ -57,7 +57,7 @@ async function main() {
                 city VARCHAR(128),
                 email VARCHAR(256) NOT NULL UNIQUE,
                 username VARCHAR(128) NOT NULL UNIQUE,
-                password VARCHAR(512) NOT NULL,
+                password VARCHAR(256) NOT NULL,
                 PRIMARY KEY (id)
             );
         `);
@@ -65,12 +65,13 @@ async function main() {
         //Creamos tabla usuario-sesión
 
         await connection.query(`
-            CREATE TABLE user_session (
+            CREATE TABLE IF NOT EXISTS user_session (
+                id BIGINT NOT NULL AUTO_INCREMENT,
                 user_id BIGINT NOT NULL,
                 session_id BIGINT NOT NULL,
-                login_mode ENUM('USERNAME', 'EMAIL') NOT NULL,
-                login VARCHAR(256) NOT NULL,
-                PRIMARY KEY(user_id, session_id),
+                login_mode ENUM('USERNAME', 'EMAIL'),
+                login VARCHAR(256),
+                PRIMARY KEY(id),
                 FOREIGN KEY (user_id)
                     REFERENCES user(id)
                     ON DELETE CASCADE,
@@ -84,31 +85,34 @@ async function main() {
 
         await connection.query(`
             CREATE TABLE IF NOT EXISTS user_company (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT NOT NULL AUTO_INCREMENT,
                 company_id BIGINT NOT NULL,
                 user_id BIGINT NOT NULL,
-                erd_work_position VARCHAR(255) NULL,
-                erd_start_date TIMESTAMP NULL,
-                erd_end_date TIMESTAMP NULL,
+                work_position VARCHAR(255),
+                starting_date DATE NOT NULL,
+                end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
                     ON DELETE CASCADE,
                 FOREIGN KEY (user_id)
                     REFERENCES user(id)
-                    ON DELETE CASCADE
+                    ON DELETE CASCADE,
+                CONSTRAINT user_company CHECK (starting_date < end_date)
             );
-        `)
+        `);
 
         //Creamos tabla company_aspects
         
         await connection.query(`
             CREATE TABLE company_aspects (
-                id BIGINT AUTO_INCREMENT UNIQUE NOT NULL,
+                id BIGINT NOT NULL AUTO_INCREMENT,
                 company_id BIGINT NOT NULL,
-                aspect1_id BIGINT NOT NULL,
-                aspect2_id BIGINT NOT NULL,
-                aspect3_id BIGINT NOT NULL,
+                aspect1 VARCHAR(2048),
+                aspect2 VARCHAR(2048),
+                aspect3 VARCHAR(2048),
+                aspect4 VARCHAR(2048),
+                aspect5 VARCHAR(2048),
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
@@ -120,17 +124,17 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE evaluation (
-                id BIGINT UNIQUE NOT NULL,
-                user_id BIGINT,
-                company_id BIGINT,
-                evaluation_date DATETIME NOT NULL,
-                starting_date DATE NOT NULL,
-                end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                company_aspects_id BIGINT UNIQUE,
-                aspect1_points TINYINT NOT NULL,
-                aspect2_points TINYINT NOT NULL,
-                aspect3_points TINYINT NOT NULL,
-                text_review VARCHAR(2048) NULL,
+                id BIGINT NOT NULL AUTO_INCREMENT,
+                user_id BIGINT NOT NULL,
+                company_id BIGINT NOT NULL,
+                company_aspects_id BIGINT NOT NULL,
+                evaluation_date DATETIME,
+                aspect1_points TINYINT,
+                aspect2_points TINYINT,
+                aspect3_points TINYINT,
+                aspect4_points TINYINT,
+                aspect5_points TINYINT,
+                text_review VARCHAR(2048),
                 PRIMARY KEY (id),
                 FOREIGN KEY (user_id)
                     REFERENCES user(id)
@@ -141,15 +145,12 @@ async function main() {
                 FOREIGN KEY (company_aspects_id)
                     REFERENCES company_aspects(id)
                     ON DELETE CASCADE,
-                CONSTRAINT evaluation CHECK ((starting_date < end_date) AND (aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
+                CONSTRAINT evaluation CHECK ((aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
             );
         `);
 
 
         console.log('Tablas creadas');
-
-        //Introducir datos de prueba
-
 
         //Introducimos sesiones
         const entries = 10;
@@ -177,7 +178,26 @@ async function main() {
         for (let i = 0; i < entries; i++) {
             await connection.query(`
                 INSERT INTO user(name, surname_1, surname_2, bio, photo, city, email, username, password)
-                VALUES ('${faker.name.firstName()}', '${faker.name.lastName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.random.word()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.internet.password()}');
+                VALUES ('${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.random.word()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
+            `)
+        }
+
+        // Introducimos aspectos a valorar
+
+        for (let i = 0; i < entries; i++) {
+            await connection.query(`
+                INSERT INTO company_aspects(company_id, aspect1, aspect2, aspect3, aspect4, aspect5)
+                VALUES ('${random(1, 10)}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}');
+            `)
+        }
+
+        //Introducimos notas
+
+        for (let i = 0; i < entries; i++) {
+            const now = new Date();
+            await connection.query(`
+                INSERT INTO evaluation(user_id ,company_id ,company_aspects_id, evaluation_date , aspect1_points, aspect2_points ,aspect3_points, aspect4_points, aspect5_points, text_review)
+                VALUES ('${random(1,10)}', '${random(1, 10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${faker.random.words()}');
             `)
         }
 
