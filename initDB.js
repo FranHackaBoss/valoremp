@@ -16,7 +16,6 @@ async function main() {
         await connection.query(`DROP TABLE IF EXISTS user_company`);
         await connection.query(`DROP TABLE IF EXISTS company_aspects`);
         await connection.query(`DROP TABLE IF EXISTS evaluation`);
-        await connection.query(`DROP TABLE IF EXISTS ressource_image_data`);
 
 
         //Creamos tabla sesión
@@ -35,11 +34,11 @@ async function main() {
         await connection.query(`
             CREATE TABLE company (
                 id BIGINT NOT NULL AUTO_INCREMENT,
-                name VARCHAR(256) NOT NULL,
-                description VARCHAR(2048),
-                logo VARCHAR(256),
-                email VARCHAR(256) NOT NULL,
-                city VARCHAR(256),
+                name VARCHAR(255) NOT NULL,
+                description TEXT,
+                logo VARCHAR(255),
+                email VARCHAR(255) NOT NULL,
+                city VARCHAR(255),
                 PRIMARY KEY (id)
             );
         `);
@@ -53,11 +52,11 @@ async function main() {
                 surname_1 VARCHAR(128) NOT NULL,
                 surname_2 VARCHAR(128) NOT NULL,
                 bio VARCHAR(2048),
-                photo VARCHAR(256),
+                photo VARCHAR(255),
                 city VARCHAR(128),
-                email VARCHAR(256) NOT NULL UNIQUE,
+                email VARCHAR(255) NOT NULL UNIQUE,
                 username VARCHAR(128) NOT NULL UNIQUE,
-                password VARCHAR(256) NOT NULL,
+                password VARCHAR(255) NOT NULL,
                 PRIMARY KEY (id)
             );
         `);
@@ -70,7 +69,7 @@ async function main() {
                 user_id BIGINT NOT NULL,
                 session_id BIGINT NOT NULL,
                 login_mode ENUM('USERNAME', 'EMAIL'),
-                login VARCHAR(256),
+                login VARCHAR(255),
                 PRIMARY KEY(id),
                 FOREIGN KEY (user_id)
                     REFERENCES user(id)
@@ -169,7 +168,7 @@ async function main() {
         for (let i = 0; i < entries; i++) {
             await connection.query(`
                 INSERT INTO company(name, description, logo, email, city)
-                VALUES ('${faker.company.companyName()}','${faker.company.catchPhraseDescriptor()}', '${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
+                VALUES ('${faker.company.companyName()}','${faker.random.word()}', '${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
             `)
         }
 
@@ -181,6 +180,28 @@ async function main() {
                 VALUES ('${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.random.word()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
             `)
         }
+
+
+        //Introducimos usuario-sesión
+
+        for (let i = 0; i < entries; i++) {
+            await connection.query(`
+                INSERT INTO user_session(user_id ,session_id ,login_mode ,login)
+                VALUES ('${random(1, 10)}', '${random(1, 10)}', 'EMAIL', '${faker.random.word()}');
+            `)
+        }
+
+        //Introducimos usuario-companía
+
+        for (let i = 0; i < entries; i++) {
+            const now = new Date();
+
+            await connection.query(`
+                INSERT INTO user_company(company_id ,user_id ,work_position ,starting_date ,end_date)
+                VALUES ('${random(1, 10)}', '${random(1, 10)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}');
+            `)
+        }
+
 
         // Introducimos aspectos a valorar
 
@@ -195,6 +216,7 @@ async function main() {
 
         for (let i = 0; i < entries; i++) {
             const now = new Date();
+
             await connection.query(`
                 INSERT INTO evaluation(user_id ,company_id ,company_aspects_id, evaluation_date , aspect1_points, aspect2_points ,aspect3_points, aspect4_points, aspect5_points, text_review)
                 VALUES ('${random(1,10)}', '${random(1, 10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${faker.random.words()}');
