@@ -1,28 +1,39 @@
 require("dotenv").config();
 const express = require("express");
-
 const morgan = require("morgan");
+const bodyParser = require("body-parser");
+const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listEntries, getEntry } = require('./controllers/user');
+const { listEntries, getEntry, newEntry } = require('./controllers/user');
 
 const { PORT } = process.env;
 
 //Creo la app de express
 const app = express();
 
-//Aplico middlewares
+//APLICO MIDDLEWARES
+//Logger
 app.use(morgan("dev"));
 
-//Rutas de la API
+//Body-parsers (body en JSON)
+app.use(bodyParser.json());
 
-//GET -/entries
+//Body parser (multipart form data <- subida imágenes)
+app.use(fileUpload());
+
+//RUTAS DE LA API
+//GET -/user
 //Devuelve todos los elementos de la tabla user
 app.get('/user', listEntries);
 
 //GET -/user/:id
 //Devuelve una entradas solo
 app.get('/user/:id', getEntry);
+
+//POST -/user
+//Crea una nueva entrada en la tabla user
+app.post('/user', newEntry);
 
 //Middleware de error
 app.use((error, req, res, next) => {

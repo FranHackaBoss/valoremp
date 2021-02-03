@@ -12,8 +12,8 @@ const listEntries = async (req, res, next) => {
 
         if (search) {
           [results] = await connection.query(`
-            SELECT user.id, user.name, user.username, AVG(aspect1_points) AS votes
-            FROM user INNER JOIN evaluation ON (evaluation.user_id = user.id)
+            SELECT user.id, user.name, user.username, AVG(IFNULL(aspect1_points, 0)) AS votes
+            FROM user LEFT JOIN evaluation ON (evaluation.user_id = user.id)
             WHERE user.name LIKE ? OR user.username LIKE ?
             GROUP BY user.id, user.name, user.username
             ORDER BY votes;
@@ -21,8 +21,8 @@ const listEntries = async (req, res, next) => {
         } else {
            //Leo las entradas de la tabla user
            [results] = await connection.query(`
-            SELECT user.id, user.name, user.username, AVG(aspect1_points) AS votes
-            FROM user INNER JOIN evaluation ON (evaluation.user_id = user.id) 
+            SELECT user.id, user.name, user.username, AVG(IFNULL(aspect1_points, 0)) AS votes
+            FROM user LEFT JOIN evaluation ON (evaluation.user_id = user.id) 
             GROUP BY user.id, user.name, user.username
             ORDER BY votes;
            `);

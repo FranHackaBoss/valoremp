@@ -11,8 +11,8 @@ const getEntry = async (req, res, next) => {
         
         //Hago la query
         const [result] = await connection.query(`
-            SELECT user.id, user.name, user.surname_1, user.surname_2, user.bio, user.photo, user.city, user.email, user.username, user.password, AVG(aspect1_points) AS votes
-            FROM user INNER JOIN evaluation ON (evaluation.user_id = user.id)
+            SELECT user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password, AVG(IFNULL(aspect1_points, 0)) AS votes
+            FROM user LEFT JOIN evaluation ON (evaluation.user_id = user.id)
             WHERE user.id = ?
         `, [id]);
         
@@ -21,7 +21,7 @@ const getEntry = async (req, res, next) => {
 
         if (single.id === null) {
             //El elemento no existe
-            const error = new Error('El elmento no existe');
+            const error = new Error('El elemento no existe');
             error.httpStatus = 404;
             throw error;
         }
