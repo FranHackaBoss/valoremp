@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
@@ -21,6 +22,9 @@ app.use(bodyParser.json());
 
 //Body parser (multipart form data <- subida imágenes)
 app.use(fileUpload());
+
+//Static
+app.use(express.static(path.join(__dirname, "static")));
 
 //RUTAS DE LA API
 //GET -/user

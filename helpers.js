@@ -4,6 +4,9 @@ const uuid = require("uuid");
 const path = require("path");
 const { ensureDir } = require("fs-extra");
 
+ const { UPLOADS_DIRECTORY } = process.env;
+ const uploadsDir = path.join(__dirname, UPLOADS_DIRECTORY);
+
 function formatDateToDB (dateObject) {
     return format(dateObject, 'yyyy-MM-dd HH:mm:ss');
 }
@@ -12,10 +15,6 @@ function formatDateToDB (dateObject) {
 async function saveImage(imageData) {
     
     //imageData es el objeto con información de la imagen
-    const { UPLOADS_DIRECTORY } = process.env;
-
-    const uploadsDir = path.join(__dirname, UPLOADS_DIRECTORY);
-
     //Asegurarse que el directorio de subida de imagenes exista
     await ensureDir(uploadsDir);
 
