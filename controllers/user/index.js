@@ -1,5 +1,8 @@
-const listEntries = require('./listEntries');
-const getEntry = require("./getEntry");
-const newEntry = require("./newEntry");
+const listUsers = require('./listUsers');
+const getUser = require("./getUser");
+const newUser = require("./newUser");
+const editUser = require('./editUser');
+const deleteUser = require("./deleteUser");
+const addUserPhoto = require("./addUserPhoto");
 
-module.exports = { listEntries, getEntry, newEntry };
+module.exports = { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto };

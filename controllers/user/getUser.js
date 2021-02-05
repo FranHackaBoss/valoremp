@@ -1,6 +1,6 @@
 const getDB = require("../../db");
 
-const getEntry = async (req, res, next) => {
+const getUser = async (req, res, next) => {
     let connection;
 
     try {
@@ -25,10 +25,21 @@ const getEntry = async (req, res, next) => {
             error.httpStatus = 404;
             throw error;
         }
+
+        //Sacamos las fotos de la entrada
+        const [photos] = await connection.query(`
+            SELECT photo, uploadDate FROM user_photo WHERE user_id=?
+        `, [id]);
+
+        console.log(photos);
+
         //Devuelvo un json con las entradas
         res.send({
             status: "ok",
-            data: single,
+            data: {
+                single,
+                photos,
+            }
         });
     } catch (error) {
         //Lo mandamos al middleware de error
@@ -38,4 +49,4 @@ const getEntry = async (req, res, next) => {
     }
 };
 
-module.exports = getEntry;
+module.exports = getUser;

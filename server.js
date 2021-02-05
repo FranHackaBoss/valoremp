@@ -6,7 +6,11 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listEntries, getEntry, newEntry } = require('./controllers/user');
+const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto } = require('./controllers/user');
+
+
+//Middlewares
+const userExists = require("./middlewares/userExists");
 
 const { PORT } = process.env;
 
@@ -29,15 +33,27 @@ app.use(express.static(path.join(__dirname, "static")));
 //RUTAS DE LA API
 //GET -/user
 //Devuelve todos los elementos de la tabla user
-app.get('/user', listEntries);
+app.get('/user', listUsers);
 
 //GET -/user/:id
 //Devuelve una entradas solo
-app.get('/user/:id', getEntry);
+app.get('/user/:id', userExists, getUser);
 
 //POST -/user
 //Crea una nueva entrada en la tabla user
-app.post('/user', newEntry);
+app.post('/user', newUser);
+
+//PUT -/user/:id
+//Edita una entrada en la base de datos
+app.put('/user/:id', userExists, editUser);
+
+//DELETE -/user/:id
+//Borra una entrada a la BBDD
+app.delete("/user/:id", userExists, deleteUser);
+
+//POST -/user/:id/user_photo
+//Añadir foto de usuario
+app.post('/user/:id', userExists, addUserPhoto);
 
 //Middleware de error
 app.use((error, req, res, next) => {

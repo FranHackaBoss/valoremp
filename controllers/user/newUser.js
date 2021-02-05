@@ -1,4 +1,3 @@
-const { image } = require("faker");
 const getDB = require("../../db");
 const { formatDateToDB, saveImage} = require("../../helpers");
 

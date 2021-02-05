@@ -72,11 +72,9 @@ async function main() {
                 login VARCHAR(255),
                 PRIMARY KEY(id),
                 FOREIGN KEY (user_id)
-                    REFERENCES user(id)
-                    ON DELETE CASCADE,
+                    REFERENCES user(id),
                 FOREIGN KEY (session_id)
                     REFERENCES session(id)
-                    ON DELETE CASCADE
             );
         `);
 
@@ -92,11 +90,9 @@ async function main() {
                 end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
-                    REFERENCES company(id)
-                    ON DELETE CASCADE,
+                    REFERENCES company(id),
                 FOREIGN KEY (user_id)
-                    REFERENCES user(id)
-                    ON DELETE CASCADE,
+                    REFERENCES user(id),
                 CONSTRAINT user_company CHECK (starting_date < end_date)
             );
         `);
@@ -115,7 +111,6 @@ async function main() {
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
-                    ON DELETE CASCADE
             );
         `);
 
@@ -135,11 +130,9 @@ async function main() {
                 text_review VARCHAR(2048),
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_aspects_id)
-                    REFERENCES company_aspects(id)
-                    ON DELETE CASCADE,
+                    REFERENCES company_aspects(id),
                 FOREIGN KEY (user_id)
-                    REFERENCES user(id)
-                    ON DELETE CASCADE,
+                    REFERENCES user(id),
                 CONSTRAINT evaluation CHECK ((aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
             );
         `);
@@ -155,7 +148,6 @@ async function main() {
                 PRIMARY KEY (id),
                 FOREIGN KEY (user_id)
                     REFERENCES user(id)
-                    ON DELETE CASCADE
             );
         `);
 
@@ -170,7 +162,6 @@ async function main() {
                 PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
-                    ON DELETE CASCADE
             );
         `);
 
