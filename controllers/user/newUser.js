@@ -1,5 +1,5 @@
 const getDB = require("../../db");
-const { formatDateToDB, saveImage} = require("../../helpers");
+const { formatDateToDB, savePhoto} = require("../../helpers");
 
 const newEntry = async (req, res, next) => {
     let connection;
@@ -40,7 +40,7 @@ const newEntry = async (req, res, next) => {
             //Hay imagenes
             for (const photoData of Object.values(req.files).slice(0, 1)) {
                 //Guardar la imagen y conseguir el nombre del fichero
-                const photoFile = await saveImage(photoData);
+                const photoFile = await savePhoto(photoData);
                 photos.push(photoFile);
                 //Meter una nueva entrada en la tabla user_photos
                 await connection.query(`

@@ -4,5 +4,7 @@ const newUser = require("./newUser");
 const editUser = require('./editUser');
 const deleteUser = require("./deleteUser");
 const addUserPhoto = require("./addUserPhoto");
+const deleteUserPhoto = require("./deleteUserPhoto");
+const userVote = require("./userVote");
 
-module.exports = { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto };
+module.exports = { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto, deleteUserPhoto, userVote };

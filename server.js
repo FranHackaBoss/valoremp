@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto } = require('./controllers/user');
+const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto, deleteUserPhoto, userVote } = require('./controllers/user');
 
 
 //Middlewares
@@ -51,9 +51,17 @@ app.put('/user/:id', userExists, editUser);
 //Borra una entrada a la BBDD
 app.delete("/user/:id", userExists, deleteUser);
 
-//POST -/user/:id/user_photo
+//POST -/user/:id/photos
 //Añadir foto de usuario
-app.post('/user/:id', userExists, addUserPhoto);
+app.post('/user/:id/photos', userExists, addUserPhoto);
+
+//DELETE -/user/:id/photos
+//Borra una foto de usuario
+app.delete('/user/:id/photos', userExists, deleteUserPhoto);
+
+//POST -/user/:id/votes/company_aspects_id
+//Usuario vota una empresa
+app.post('/user/:id/votes/:company_aspects_id', userExists, userVote);
 
 //Middleware de error
 app.use((error, req, res, next) => {

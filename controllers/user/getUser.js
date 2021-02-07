@@ -19,19 +19,10 @@ const getUser = async (req, res, next) => {
         //Desestructuro el elemento de los resultados
         const [single] = result;
 
-        if (single.id === null) {
-            //El elemento no existe
-            const error = new Error('El elemento no existe');
-            error.httpStatus = 404;
-            throw error;
-        }
-
         //Sacamos las fotos de la entrada
         const [photos] = await connection.query(`
-            SELECT photo, uploadDate FROM user_photo WHERE user_id=?
+            SELECT id, photo, uploadDate FROM user_photo WHERE user_id=?
         `, [id]);
-
-        console.log(photos);
 
         //Devuelvo un json con las entradas
         res.send({

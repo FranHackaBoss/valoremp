@@ -9,27 +9,14 @@ async function main() {
     try {
         connection = await getDB();
 
-        await connection.query(`DROP TABLE IF EXISTS session`);
-        await connection.query(`DROP TABLE IF EXISTS company`);
-        await connection.query(`DROP TABLE IF EXISTS user`);
-        await connection.query(`DROP TABLE IF EXISTS user_session`);
-        await connection.query(`DROP TABLE IF EXISTS user_company`);
-        await connection.query(`DROP TABLE IF EXISTS company_aspects`);
-        await connection.query(`DROP TABLE IF EXISTS evaluation`);
         await connection.query(`DROP TABLE IF EXISTS user_photo`);
         await connection.query(`DROP TABLE IF EXISTS company_logo`);
+        await connection.query(`DROP TABLE IF EXISTS evaluation`);
+        await connection.query(`DROP TABLE IF EXISTS company_aspects`);
+        await connection.query(`DROP TABLE IF EXISTS user_company`);
+        await connection.query(`DROP TABLE IF EXISTS company`);
+        await connection.query(`DROP TABLE IF EXISTS user`);
 
-
-        //Creamos tabla sesión
-
-        await connection.query(`
-            CREATE TABLE IF NOT EXISTS session (
-                id BIGINT AUTO_INCREMENT,
-                device ENUM ('DESKTOP', 'MOBILE', 'ANDROID', 'IOS') NOT NULL,
-                connection_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (id)
-            );
-        `)
 
         //Creamos tabla company
         
@@ -61,23 +48,7 @@ async function main() {
             );
         `);
         
-        //Creamos tabla usuario-sesión
-
-        await connection.query(`
-            CREATE TABLE IF NOT EXISTS user_session (
-                id BIGINT AUTO_INCREMENT,
-                user_id BIGINT NOT NULL,
-                session_id BIGINT NOT NULL,
-                login_mode ENUM('USERNAME', 'EMAIL'),
-                login VARCHAR(255),
-                PRIMARY KEY(id),
-                FOREIGN KEY (user_id)
-                    REFERENCES user(id),
-                FOREIGN KEY (session_id)
-                    REFERENCES session(id)
-            );
-        `);
-
+    
         //Creamos tabla usuario-companía
 
         await connection.query(`
@@ -122,7 +93,7 @@ async function main() {
                 company_aspects_id BIGINT NOT NULL,
                 user_id BIGINT NOT NULL,
                 evaluation_date DATETIME,
-                aspect1_points TINYINT,
+                aspect1_points TINYINT NOT NULL,
                 aspect2_points TINYINT,
                 aspect3_points TINYINT,
                 aspect4_points TINYINT,
@@ -133,7 +104,7 @@ async function main() {
                     REFERENCES company_aspects(id),
                 FOREIGN KEY (user_id)
                     REFERENCES user(id),
-                CONSTRAINT evaluation CHECK ((aspect1_points >= 0 AND aspect1_points <= 10) AND (aspect2_points >= 0 AND aspect2_points <= 10) AND (aspect3_points >= 0 AND aspect3_points <= 10))
+                CONSTRAINT evaluation_CK1 CHECK (aspect1_points >= 1 AND aspect1_points <= 10 AND aspect2_points >= 1 AND aspect2_points <= 10 AND aspect3_points >= 1 AND aspect3_points <= 10 AND aspect4_points >= 1 AND aspect4_points <= 10 AND aspect5_points >= 1 AND aspect5_points <= 10)
             );
         `);
 
@@ -168,21 +139,11 @@ async function main() {
 
         console.log('Tablas creadas');
 
-        //Introducimos sesiones
-        const entries = 10;
-
-        for (let i = 0; i < entries; i++) {
-            const now = new Date();
-
-            await connection.query(`
-                INSERT INTO session(device, connection_date)
-                VALUES ('DESKTOP', '${formatDateToDB(now)}');
-            `)
-        }
-        
+        const users = 25;
+        const companies = 10;
         //Introducimos companies
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < companies; i++) {
             await connection.query(`
                 INSERT INTO company(name, description, email, city)
                 VALUES ('${faker.company.companyName()}','${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
@@ -191,7 +152,7 @@ async function main() {
 
         //Introducimos usuarios
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < users; i++) {
             await connection.query(`
                 INSERT INTO user(name, surname_1, surname_2, bio, city, email, username, password)
                 VALUES ('${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
@@ -199,18 +160,9 @@ async function main() {
         }
 
 
-        //Introducimos usuario-sesión
-
-        for (let i = 0; i < entries; i++) {
-            await connection.query(`
-                INSERT INTO user_session(user_id ,session_id ,login_mode ,login)
-                VALUES ('${random(1, 10)}', '${random(1, 10)}', 'EMAIL', '${faker.random.word()}');
-            `)
-        }
-
         //Introducimos usuario-companía
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < users; i++) {
             const now = new Date();
 
             await connection.query(`
@@ -222,7 +174,7 @@ async function main() {
 
         // Introducimos aspectos a valorar
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < companies; i++) {
             await connection.query(`
                 INSERT INTO company_aspects(company_id, aspect1, aspect2, aspect3, aspect4, aspect5)
                 VALUES ('${random(1, 10)}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}');
@@ -231,7 +183,7 @@ async function main() {
 
         //Introducimos notas
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < users; i++) {
             const now = new Date();
 
             await connection.query(`
@@ -242,7 +194,7 @@ async function main() {
 
         //Introducimos fotos usuario
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < users; i++) {
             const now = new Date();
 
             await connection.query(`
@@ -253,7 +205,7 @@ async function main() {
 
         //Introducimos logo empresa
 
-        for (let i = 0; i < entries; i++) {
+        for (let i = 0; i < companies; i++) {
             const now = new Date();
 
             await connection.query(`

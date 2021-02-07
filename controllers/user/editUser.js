@@ -8,18 +8,6 @@ const editUser = async (req, res, next) => {
 
         const { id } = req.params;
 
-        //Comprobamos que existe una entrada con ese id
-        const [current,] = await connection.query(`
-            SELECT id FROM user WHERE id=?
-        `, [id]);
-
-        //Si no existe devolver un 404
-        if (current.length === 0) {
-            const error = new Error('No existe ninguna entrada en la base de datos con ese id');
-            error.httpStatus = 404;
-            throw error;
-        }
-
         //Comprobar que los datos mínimos vienen en el body
         const { name, surname_1, surname_2, bio, city, email, username, password } = req.body;
 

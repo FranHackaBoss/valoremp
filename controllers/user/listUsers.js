@@ -5,7 +5,7 @@ const listUsers = async (req, res, next) => {
     try {
         connection = await getDB();
 
-        //Saco querrstring                                                          
+        //Saco querystring                                                          
         const { search } = req.query;
 
         let results;

@@ -8,18 +8,6 @@ const deleteUser = async (req, res, next) => {
 
         const { id } = req.params;
 
-        //Comprobar que la entrada existe
-        const [current,] = await connection.query(`
-            SELECT id FROM user WHERE id=?
-        `, [id]);
-
-        //Si no existe devolver un 404
-        if (current.length === 0) {
-            const error = new Error('No existe ninguna entrada en la base de datos con ese id');
-            error.httpStatus = 404;
-            throw error;
-        }
-
         //Seleccionar la foto relacionada y borrar los ficheros de disco
         const [photos] = await connection.query(`
             SELECT photo FROM user_photo WHERE user_id=?
@@ -37,10 +25,6 @@ const deleteUser = async (req, res, next) => {
         }
 
         //FUTURO: borrar los posibles entradas en tablas relacionadas
-        await connection.query(`
-            DELETE FROM user_session WHERE user_id=?
-        `, [id]);
-
         await connection.query(`
             DELETE FROM user_company WHERE user_id=?
         `, [id]);

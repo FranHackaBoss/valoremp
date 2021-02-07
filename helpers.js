@@ -19,7 +19,7 @@ async function deletePhoto(photo) {
 }
 
 
-async function saveImage(imageData) {
+async function savePhoto(imageData) {
     
     //imageData es el objeto con información de la imagen
     //Asegurarse que el directorio de subida de imagenes exista
@@ -47,4 +47,4 @@ async function saveImage(imageData) {
     return savedImageName;
     }
 
-module.exports = { formatDateToDB, saveImage, deletePhoto };
+module.exports = { formatDateToDB, savePhoto, deletePhoto };
