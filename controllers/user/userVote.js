@@ -16,12 +16,12 @@ const userVote = async (req, res, next) => {
             throw(error);
         }
         //Compruebo si el usuario ya ha votado
-        const [currentPhotos] = await connection.query(`
+        const [currentVotes] = await connection.query(`
             SELECT id FROM evaluation WHERE user_id=? AND company_aspects_id=?
         `, [id, company_aspects_id]);
 
-        //Si ya hay una foto asociada al usuario devolvemos un error
-        if(currentPhotos.length >= 1) {
+        //Si ya ha votado devolvemos un error
+        if(currentVotes.length >= 1) {
             const error = new Error('El usuario ya ha votado a esta empresa');
             error.httpStatus = 403;
             throw error;
@@ -43,10 +43,33 @@ const userVote = async (req, res, next) => {
         `, [company_aspects_id, id, now, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points]);
 
         const [results] = await connection.query(`
-            SELECT AVG(aspect1_points) AS votes_aspect1, AVG(aspect2_points) AS votes_aspect2, AVG(aspect3_points) AS votes_aspect3, AVG(aspect4_points) AS votes_aspect4, AVG(aspect5_points) AS votes_aspect5
-            FROM user LEFT JOIN evaluation ON (evaluation.user_id = user.id)
-            WHERE user_id=?
-            `, [id]);
+            SELECT SUM(aspect1_points + aspect2_points + aspect3_points + aspect4_points + aspect5_points) AS total
+            FROM company_aspects
+            INNER JOIN evaluation ON (company_aspects.id = evaluation.company_aspects_id)
+            INNER JOIN company ON (company.id = company_aspects.company_id)
+            WHERE user_id=? AND company_aspects_id=?
+            `, [id, company_aspects_id]);
+
+        //Calculo la ponderación en función de los años del usuario en la empresa
+        const [startDate] = await connection.query(`
+            SELECT starting_date 
+            FROM user_company
+            WHERE user_company.user_id=? AND user_company.company_id=?
+        `, [id, company_aspects_id]);
+
+        const [endDate] = await connection.query(`
+            SELECT end_date 
+            FROM user_company
+            WHERE user_company.user_id=? AND user_company.company_id=?
+        `, [id, company_aspects_id]);
+
+        
+        console.log(startDate[0].starting_date, endDate[0].end_date);
+
+        let timeGap = endDate[0].end_date.getFullYear() - startDate[0].starting_date.getFullYear();
+        console.log(results[0].total);
+
+        let finalScore = Math.round(results[0].total * (1 + (timeGap * 0.1)));
 
         res.send({
             status: "ok",
@@ -59,7 +82,8 @@ const userVote = async (req, res, next) => {
                 aspect3_points,
                 aspect4_points,
                 aspect5_points,
-                votes: results
+                total: results,
+                final: finalScore
             }
         });
     } catch(error) {
