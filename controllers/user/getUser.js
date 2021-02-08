@@ -11,8 +11,8 @@ const getUser = async (req, res, next) => {
         
         //Hago la query
         const [result] = await connection.query(`
-            SELECT user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password, AVG(IFNULL(aspect1_points, 0)) AS votes
-            FROM user LEFT JOIN evaluation ON (evaluation.user_id = user.id)
+            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password
+            FROM user
             WHERE user.id = ?
         `, [id]);
         

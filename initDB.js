@@ -23,6 +23,7 @@ async function main() {
         await connection.query(`
             CREATE TABLE company (
                 id BIGINT AUTO_INCREMENT,
+                signup_date DATETIME NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 description TEXT,
                 email VARCHAR(255) NOT NULL,
@@ -36,6 +37,7 @@ async function main() {
         await connection.query(`
             CREATE TABLE user (
                 id BIGINT AUTO_INCREMENT,
+                signup_date DATETIME NOT NULL,
                 name VARCHAR(128) NOT NULL,
                 surname_1 VARCHAR(128) NOT NULL,
                 surname_2 VARCHAR(128) NOT NULL,
@@ -44,6 +46,7 @@ async function main() {
                 email VARCHAR(255) NOT NULL UNIQUE,
                 username VARCHAR(128) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL,
+                active BOOLEAN DEFAULT false,
                 PRIMARY KEY (id)
             );
         `);
@@ -141,12 +144,13 @@ async function main() {
 
         const users = 25;
         const companies = 10;
+        const now = new Date();
         //Introducimos companies
 
         for (let i = 0; i < companies; i++) {
             await connection.query(`
-                INSERT INTO company(name, description, email, city)
-                VALUES ('${faker.company.companyName()}','${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
+                INSERT INTO company(signup_date, name, description, email, city)
+                VALUES ('${formatDateToDB(now)}', '${faker.company.companyName()}','${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
             `)
         }
 
@@ -154,8 +158,8 @@ async function main() {
 
         for (let i = 0; i < users; i++) {
             await connection.query(`
-                INSERT INTO user(name, surname_1, surname_2, bio, city, email, username, password)
-                VALUES ('${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
+                INSERT INTO user(signup_date, name, surname_1, surname_2, bio, city, email, username, password)
+                VALUES ('${formatDateToDB(now)}', '${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
             `)
         }
 
@@ -163,7 +167,6 @@ async function main() {
         //Introducimos usuario-companía
 
         for (let i = 0; i < users; i++) {
-            const now = new Date();
 
             await connection.query(`
                 INSERT INTO user_company(company_id ,user_id ,work_position ,starting_date ,end_date)

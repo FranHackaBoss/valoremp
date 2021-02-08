@@ -22,17 +22,17 @@ const newEntry = async (req, res, next) => {
         }
 
         //Ejecuto la inserción en la BBDD
-        const [result] = await connection.query(`
-            INSERT INTO user (name, surname_1, surname_2, bio, city, email, username, password)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?);
-        `, [name, surname_1, surname_2, bio, city, email, username, password]);
-
-        //Saco la id de la fila insertada
-        const { insertId } = result;
-
         //Creo un objeto con la fecha actual
         const now = new Date();
 
+        const [result] = await connection.query(`
+            INSERT INTO user (signup_date, name, surname_1, surname_2, bio, city, email, username, password)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `, [now, name, surname_1, surname_2, bio, city, email, username, password]);
+
+        //Saco la id de la fila insertada
+        const { insertId } = result;
+        
         //Procesar las imágenes
         const photos = [];
 
@@ -56,6 +56,7 @@ const newEntry = async (req, res, next) => {
             status: "ok",
             data: {
                 id: insertId,
+                signup_date: now,
                 name,
                 surname_1,
                 surname_2,
