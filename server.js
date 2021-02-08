@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto, deleteUserPhoto, userVote } = require('./controllers/user');
+const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto, deleteUserPhoto, userVote, addUserComp } = require('./controllers/user');
 
 
 //Middlewares
@@ -59,9 +59,13 @@ app.post('/user/:id/photos', userExists, addUserPhoto);
 //Borra una foto de usuario
 app.delete('/user/:id/photos', userExists, deleteUserPhoto);
 
-//POST -/user/:id/votes/company_aspects_id
+//POST -/user/:id/votes/:company_aspects_id
 //Usuario vota una empresa
 app.post('/user/:id/votes/:company_aspects_id', userExists, userVote);
+
+//POST -/user/:id/related/:company_id
+//Añadir relación usuario empresa
+app.post('/user/:id/related/:company_id', userExists, addUserComp);
 
 //Middleware de error
 app.use((error, req, res, next) => {
