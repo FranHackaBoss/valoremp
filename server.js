@@ -6,11 +6,12 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, editUser, deleteUser, addUserPhoto, deleteUserPhoto, userVote, addUserComp } = require('./controllers/user');
-
+const { listUsers, getUser, newUser, editUser, deleteUser, userVote, addUserComp } = require('./controllers/user');
+const { listCompanies, getCompany, addCompanyPhotos } = require('./controllers/company');
 
 //Middlewares
 const userExists = require("./middlewares/userExists");
+const companyExists = require("./middlewares/companyExists");
 
 const { PORT } = process.env;
 
@@ -30,7 +31,7 @@ app.use(fileUpload());
 //Static
 app.use(express.static(path.join(__dirname, "static")));
 
-//RUTAS DE LA API
+//RUTAS DE LA API usuarios
 //GET -/user
 //Devuelve todos los elementos de la tabla user
 app.get('/user', listUsers);
@@ -51,14 +52,6 @@ app.put('/user/:id', userExists, editUser);
 //Borra una entrada a la BBDD
 app.delete("/user/:id", userExists, deleteUser);
 
-//POST -/user/:id/photos
-//Añadir foto de usuario
-app.post('/user/:id/photos', userExists, addUserPhoto);
-
-//DELETE -/user/:id/photos
-//Borra una foto de usuario
-app.delete('/user/:id/photos', userExists, deleteUserPhoto);
-
 //POST -/user/:id/votes/:company_aspects_id
 //Usuario vota una empresa
 app.post('/user/:id/votes/:company_aspects_id', userExists, userVote);
@@ -66,6 +59,19 @@ app.post('/user/:id/votes/:company_aspects_id', userExists, userVote);
 //POST -/user/:id/related/:company_id
 //Añadir relación usuario empresa
 app.post('/user/:id/related/:company_id', userExists, addUserComp);
+
+//Rutas de la API empresas
+//GET -/company
+//Devuelve todos los elementos de la tabla company
+app.get('/company', listCompanies);
+
+//GET -/company/:id
+//Devuelve una entradas solo
+app.get('/company/:id', companyExists, getCompany);
+
+//POST -/company/:id
+//Empresa sube foto
+app.post('/company/:id', companyExists, addCompanyPhotos);
 
 //Middleware de error
 app.use((error, req, res, next) => {

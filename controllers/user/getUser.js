@@ -16,21 +16,11 @@ const getUser = async (req, res, next) => {
             WHERE user.id = ?
         `, [id]);
         
-        //Desestructuro el elemento de los resultados
-        const [single] = result;
-
-        //Sacamos las fotos de la entrada
-        const [photos] = await connection.query(`
-            SELECT id, photo, uploadDate FROM user_photo WHERE user_id=?
-        `, [id]);
-
+        
         //Devuelvo un json con las entradas
         res.send({
             status: "ok",
-            data: {
-                single,
-                photos,
-            }
+            data: result
         });
     } catch (error) {
         //Lo mandamos al middleware de error

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const faker = require("faker");
 const { random } = require("lodash");
 const getDB = require("./db");
@@ -9,8 +10,7 @@ async function main() {
     try {
         connection = await getDB();
 
-        await connection.query(`DROP TABLE IF EXISTS user_photo`);
-        await connection.query(`DROP TABLE IF EXISTS company_logo`);
+        await connection.query(`DROP TABLE IF EXISTS company_photos`);
         await connection.query(`DROP TABLE IF EXISTS evaluation`);
         await connection.query(`DROP TABLE IF EXISTS company_aspects`);
         await connection.query(`DROP TABLE IF EXISTS user_company`);
@@ -22,13 +22,14 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE company (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 signup_date DATETIME NOT NULL,
                 name VARCHAR(255) NOT NULL,
+                city VARCHAR(255),
                 description TEXT,
                 email VARCHAR(255) NOT NULL,
-                city VARCHAR(255) NOT NULL,
-                PRIMARY KEY (id)
+                password VARCHAR(512) NOT NULL,
+                logo VARCHAR(50)
             );
         `);
 
@@ -36,18 +37,20 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE user (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 signup_date DATETIME NOT NULL,
                 name VARCHAR(128) NOT NULL,
                 surname_1 VARCHAR(128) NOT NULL,
-                surname_2 VARCHAR(128) NOT NULL,
+                surname_2 VARCHAR(128),
                 bio VARCHAR(2048),
-                city VARCHAR(128) NOT NULL,
+                city VARCHAR(128),
                 email VARCHAR(255) NOT NULL UNIQUE,
                 username VARCHAR(128) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
+                password VARCHAR(512) NOT NULL,
+                avatar VARCHAR(50),
                 active BOOLEAN DEFAULT false,
-                PRIMARY KEY (id)
+                registrationCode VARCHAR(100),
+                role ENUM("admin", "normal") DEFAULT "normal" NOT NULL
             );
         `);
         
@@ -56,13 +59,12 @@ async function main() {
 
         await connection.query(`
             CREATE TABLE IF NOT EXISTS user_company (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 company_id BIGINT NOT NULL,
                 user_id BIGINT NOT NULL,
                 work_position VARCHAR(255),
                 starting_date DATE NOT NULL,
                 end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id),
                 FOREIGN KEY (user_id)
@@ -70,19 +72,18 @@ async function main() {
                 CONSTRAINT user_company CHECK (starting_date < end_date)
             );
         `);
-
+        
         //Creamos tabla company_aspects
         
         await connection.query(`
             CREATE TABLE company_aspects (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 company_id BIGINT NOT NULL,
                 aspect1 VARCHAR(2048),
                 aspect2 VARCHAR(2048),
                 aspect3 VARCHAR(2048),
                 aspect4 VARCHAR(2048),
                 aspect5 VARCHAR(2048),
-                PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
             );
@@ -92,7 +93,7 @@ async function main() {
         
         await connection.query(`
             CREATE TABLE evaluation (
-                id BIGINT AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 company_aspects_id BIGINT NOT NULL,
                 user_id BIGINT NOT NULL,
                 evaluation_date DATETIME,
@@ -102,7 +103,6 @@ async function main() {
                 aspect4_points TINYINT,
                 aspect5_points TINYINT,
                 text_review VARCHAR(2048),
-                PRIMARY KEY (id),
                 FOREIGN KEY (company_aspects_id)
                     REFERENCES company_aspects(id),
                 FOREIGN KEY (user_id)
@@ -111,29 +111,14 @@ async function main() {
             );
         `);
 
-        //Creamos tabla usuario-fotos
+        //Creamos tabla empresa-photos
 
         await connection.query(`
-            CREATE TABLE user_photo (
-                id BIGINT AUTO_INCREMENT,
+            CREATE TABLE company_photos (
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 uploadDate DATETIME NOT NULL,
                 photo VARCHAR(50) NOT NULL,
-                user_id BIGINT NOT NULL,
-                PRIMARY KEY (id),
-                FOREIGN KEY (user_id)
-                    REFERENCES user(id)
-            );
-        `);
-
-        //Creamos tabla empresa-logo
-
-        await connection.query(`
-            CREATE TABLE company_logo (
-                id BIGINT AUTO_INCREMENT,
-                uploadDate DATETIME NOT NULL,
-                logo VARCHAR(50) NOT NULL,
                 company_id BIGINT NOT NULL,
-                PRIMARY KEY (id),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
             );
@@ -142,36 +127,53 @@ async function main() {
 
         console.log('Tablas creadas');
 
-        const users = 25;
-        const companies = 10;
-        const now = new Date();
+        let users = 10;
+        let companies = 10;
+        let now = new Date();
+        
+        //Datos de prueba
         //Introducimos companies
 
         for (let i = 0; i < companies; i++) {
+            const company = faker.company.companyName();
+            const email = faker.internet.email();
+            const password = faker.internet.password();
+
             await connection.query(`
-                INSERT INTO company(signup_date, name, description, email, city)
-                VALUES ('${formatDateToDB(now)}', '${faker.company.companyName()}','${faker.random.word()}', '${faker.internet.email()}', '${faker.address.city()}');
+                INSERT INTO company(signup_date, name, email, password)
+                VALUES ('${formatDateToDB(now)}', '${company}', '${email}', SHA2('${password}', 512));
             `)
         }
-
         //Introducimos usuarios
+        //introducimos un usuario administrador
+        await connection.query(`
+            INSERT INTO user (signup_date, name, surname_1, email, username, password, active, role)
+            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', 'fran@gmail.com', 'paquito', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
+        `);
 
+        //Introducimo usuarios aleatorios
         for (let i = 0; i < users; i++) {
+            const name = faker.name.firstName();
+            const lastName = faker.name.lastName();
+            const email = faker.internet.email();
+            const username = faker.internet.userName();
+            const password = faker.internet.password();
+
             await connection.query(`
-                INSERT INTO user(signup_date, name, surname_1, surname_2, bio, city, email, username, password)
-                VALUES ('${formatDateToDB(now)}', '${faker.name.firstName()}', '${faker.name.middleName()}', '${faker.name.lastName()}', '${faker.name.jobDescriptor()}', '${faker.address.city()}', '${faker.internet.email()}', '${faker.internet.userName()}', '${faker.random.word()}');
-            `)
+                INSERT INTO user(signup_date, name, surname_1, email, username, password, active)
+                VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${email}', '${username}', SHA2('${password}', 512), true);
+            `);
         }
 
 
-        //Introducimos usuario-companía
+       //Introducimos usuario-companía
 
         for (let i = 0; i < users; i++) {
 
             await connection.query(`
                 INSERT INTO user_company(company_id ,user_id ,work_position ,starting_date ,end_date)
-                VALUES ('${random(1, 10)}', '${random(1, 10)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}');
-            `)
+                VALUES ('${random(1, 10)}', '${random(2, users+1)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}');
+            `);
         }
 
 
@@ -181,7 +183,7 @@ async function main() {
             await connection.query(`
                 INSERT INTO company_aspects(company_id, aspect1, aspect2, aspect3, aspect4, aspect5)
                 VALUES ('${random(1, 10)}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}');
-            `)
+            `);
         }
 
         //Introducimos notas
@@ -191,30 +193,19 @@ async function main() {
 
             await connection.query(`
                 INSERT INTO evaluation(user_id ,company_aspects_id, evaluation_date , aspect1_points, aspect2_points ,aspect3_points, aspect4_points, aspect5_points, text_review)
-                VALUES ('${random(1,10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${faker.random.words()}');
-            `)
+                VALUES ('${random(2,users+1)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${faker.random.words()}');
+            `);
         }
 
-        //Introducimos fotos usuario
-
-        for (let i = 0; i < users; i++) {
-            const now = new Date();
-
-            await connection.query(`
-                INSERT INTO user_photo(uploadDate, photo, user_id)
-                VALUES ('${formatDateToDB(now)}', '${faker.random.word()}', '${random(1, 10)}' );
-            `)
-        }
-
-        //Introducimos logo empresa
+        //Introducimos fotos empresa
 
         for (let i = 0; i < companies; i++) {
             const now = new Date();
 
             await connection.query(`
-                INSERT INTO company_logo(uploadDate, logo, company_id)
+                INSERT INTO company_photos(uploadDate, photo, company_id)
                 VALUES ('${formatDateToDB(now)}', '${faker.random.word()}', '${random(1, 10)}' );
-            `)
+            `);
         }
 
     } catch(error) {

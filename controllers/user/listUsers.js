@@ -34,29 +34,11 @@ const listUsers = async (req, res, next) => {
            `,);
         }
 
-        //Saco las id's de los resultados
-        const ids = results.map((result) => result.id);
-
-        //Selecciono todas las fotos que estén relacionadas con una id de results
-        const [photos] = await connection.query(`
-            SELECT * FROM user_photo WHERE user_id IN (${ids.join(',')})
-        `);
-
-        //Unimos el array de fotos resultante de la query anterior con los results
-        const resultsWithPhotos = results.map(result => {
-            //Fotos correspondiente al resultado (sí las hay de lo contrario devolverá un array vacío)
-            const resultPhotos = photos.filter(photo => photo.user_id === result.id);
-
-            return {
-                ...result,
-                photos: resultPhotos
-            };
-        });
-
+        
         //Devuelvo un json con el resultado + array de fotos
         res.send({
             status: "ok",
-            data: resultsWithPhotos,
+            data: results,
         });
     } catch (error) {
         //Lo mandamos al middleware de error
