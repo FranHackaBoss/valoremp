@@ -8,12 +8,12 @@ const addUserComp = async (req, res, next) => {
 
         const { company_id, id } = req.params;
 
-        //Compruebo si el usuario ya ha subido una foto
+        //Compruebo si el usuario ya está relacionado con la empresa
         const [currentRelation] = await connection.query(`
             SELECT id FROM user_company WHERE user_id=? AND company_id=?
         `, [id, company_id]);
         
-        //Si ya hay una foto asociada al usuario devolvemos un error
+        //Si ya hay una relación usuario-empresa devolvemos un error
         if(currentRelation.length > 0) {
             const error = new Error('Ya existe una relación para este usuario y esta empresa');
             error.httpStatus = 403;

@@ -50,7 +50,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/user?order=city&direction=DESC",
+					"raw": "http://localhost:3000/user?search=Iglesias&order=id&direction=DESC",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -62,12 +62,11 @@
 					"query": [
 						{
 							"key": "search",
-							"value": "East",
-							"disabled": true
+							"value": "Iglesias"
 						},
 						{
 							"key": "order",
-							"value": "city"
+							"value": "id"
 						},
 						{
 							"key": "direction",
@@ -81,10 +80,10 @@
 		{
 			"name": "Muestra un usuario",
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/user/10",
+					"raw": "http://localhost:3000/user/8?photo",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -92,7 +91,13 @@
 					"port": "3000",
 					"path": [
 						"user",
-						"10"
+						"8"
+					],
+					"query": [
+						{
+							"key": "photo",
+							"value": null
+						}
 					]
 				}
 			},
@@ -227,58 +232,6 @@
 			"response": []
 		},
 		{
-			"name": "Añadir foto de usuario",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "photo",
-							"type": "file",
-							"src": "/home/zisko/Downloads/mandalorian.jpeg"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:3000/user/31/photos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"31",
-						"photos"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Borrar foto de usuario",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/user/31/photos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"31",
-						"photos"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Votar una empresa",
 			"request": {
 				"method": "POST",
@@ -335,6 +288,214 @@
 						"6",
 						"related",
 						"7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar empresas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/company/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar empresas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/company/?search=Parisian",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						""
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "Parisian"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Muestra una empresa",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/company/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Añadir foto empresa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "photo",
+							"type": "file",
+							"src": "/home/zisko/Downloads/mandalorian.jpeg"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/company/9/photos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"9",
+						"photos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar foto empresa",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/company/9/photos/20",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"9",
+						"photos",
+						"20"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar datos empresa",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"pepito inc\",\n    \"city\": \"A Coruña\",\n    \"description\": \"fabricamos tonterias\",\n    \"email\": \"pepito@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/company/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Empresa crea aspectos de valoración",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"aspect1\": \"Ambiente de trabajo\",\n    \"aspect2\": \"Jefes\",\n    \"aspect3\":\"Horarios\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/company/4/aspects",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"4",
+						"aspects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modificar aspectos de valoración",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"aspect1\": \"a ver si va\",\n    \"aspect2\": \"\",\n    \"aspect3\": \"\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/company/3/edit_aspects",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"company",
+						"3",
+						"edit_aspects"
 					]
 				}
 			},

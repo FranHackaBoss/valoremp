@@ -7,7 +7,7 @@ const fileUpload = require("express-fileupload");
 
 //Controladores
 const { listUsers, getUser, newUser, editUser, deleteUser, userVote, addUserComp } = require('./controllers/user');
-const { listCompanies, getCompany, addCompanyPhotos } = require('./controllers/company');
+const { listCompanies, getCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
 
 //Middlewares
 const userExists = require("./middlewares/userExists");
@@ -69,9 +69,33 @@ app.get('/company', listCompanies);
 //Devuelve una entradas solo
 app.get('/company/:id', companyExists, getCompany);
 
-//POST -/company/:id
+//POST -/company/:id/photos
 //Empresa sube foto
-app.post('/company/:id', companyExists, addCompanyPhotos);
+app.post('/company/:id/photos', companyExists, addCompanyPhotos);
+
+// DELETE - /company/:id/photos/:photoID
+// Borra una foto de la empresa
+app.delete("/company/:id/photos/:photoID", companyExists, deleteCompanyPhoto);
+
+// PUT - /company/:id
+// Edita una empresa en la BBDD
+app.put("/company/:id", companyExists, editCompany);
+
+//POST -/company/:id/aspects
+//Introduce los aspectos a valorar
+app.post("/company/:id/aspects", companyExists, createCompanyAspects);
+
+//PUT -/company/:id/edit_aspects
+//Editar aspectos a valorar
+app.put("/company/:id/edit_aspects", companyExists, editCompanyAspects);
+
+//DELETE -/company/:id
+//Borrar empresa
+app.delete("/company/:id", companyExists, deleteCompany);
+
+//POST -/company
+//Nueva entrada tabla empresa
+
 
 //Middleware de error
 app.use((error, req, res, next) => {
