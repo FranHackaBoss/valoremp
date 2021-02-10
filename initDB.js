@@ -29,7 +29,9 @@ async function main() {
                 description TEXT,
                 email VARCHAR(255) NOT NULL,
                 password VARCHAR(512) NOT NULL,
-                logo VARCHAR(50)
+                logo VARCHAR(50),
+                active BOOLEAN DEFAULT false,
+                registrationCode VARCHAR(100)
             );
         `);
 
@@ -44,6 +46,7 @@ async function main() {
                 surname_2 VARCHAR(128),
                 bio VARCHAR(2048),
                 city VARCHAR(128),
+                dni VARCHAR(128) NOT NULL UNIQUE,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password VARCHAR(512) NOT NULL,
                 avatar VARCHAR(50),
@@ -139,27 +142,28 @@ async function main() {
             const password = faker.internet.password();
 
             await connection.query(`
-                INSERT INTO company(signup_date, name, email, password)
-                VALUES ('${formatDateToDB(now)}', '${company}', '${email}', SHA2('${password}', 512));
+                INSERT INTO company(signup_date, name, email, password, active)
+                VALUES ('${formatDateToDB(now)}', '${company}', '${email}', SHA2('${password}', 512), true);
             `)
         }
         //Introducimos usuarios
         //introducimos un usuario administrador
         await connection.query(`
-            INSERT INTO user (signup_date, name, surname_1, email, password, active, role)
-            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
+            INSERT INTO user (signup_date, name, surname_1, dni, email, password, active, role)
+            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', '35698542X', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
         `);
 
         //Introducimo usuarios aleatorios
         for (let i = 0; i < users; i++) {
             const name = faker.name.firstName();
             const lastName = faker.name.lastName();
+            const dni = faker.random.word();
             const email = faker.internet.email();
             const password = faker.internet.password();
 
             await connection.query(`
-                INSERT INTO user(signup_date, name, surname_1, email, password, active)
-                VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${email}', SHA2('${password}', 512), true);
+                INSERT INTO user(signup_date, name, surname_1, dni, email, password, active)
+                VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${dni}', '${email}', SHA2('${password}', 512), true);
             `);
         }
 

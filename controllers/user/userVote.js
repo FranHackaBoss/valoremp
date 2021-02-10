@@ -9,6 +9,20 @@ const userVote = async (req, res, next) => {
         const { id, company_aspects_id } = req.params;
         const { evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points } = req.body;
 
+        //Compruebo que existe relación entre el usuario y la empresa
+        const [relatioship] = await connection.query(`
+            SELECT id 
+            FROM user_company
+            WHERE user_company.user_id=? AND user_company.company_id=?
+            `, [id, company_aspects_id]);
+
+        //Sí no existe la relación lanzo un error
+        if (relatioship.length === 0) {
+            const error = new Error('No existe relación entre el usuario y la empresa');
+            error.httpStatus = 403;
+            throw(error);
+        }
+
         //Sí la puntuación no se encuentra entre 0 y 10 lanzo un error
         if(aspect1_points < 1 || aspect1_points > 10 || aspect2_points < 1 || aspect2_points > 10 || aspect3_points < 1 || aspect3_points > 10 || aspect4_points < 1 || aspect4_points > 10 || aspect5_points < 1 || aspect5_points > 10) {
             const error = new Error('La puntuación debe de estar entre 0 y 10');
@@ -56,7 +70,7 @@ const userVote = async (req, res, next) => {
             FROM user_company
             WHERE user_company.user_id=? AND user_company.company_id=?
         `, [id, company_aspects_id]);
-
+        console.log(startDate);
         const [endDate] = await connection.query(`
             SELECT end_date 
             FROM user_company

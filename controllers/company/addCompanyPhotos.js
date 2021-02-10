@@ -26,27 +26,33 @@ const addCompanyPhotos = async (req, res, next) => {
       throw error;
     }
 
-    let savedPhoto;
+    // Procesar las imágenes
+    const photos = [];
 
-    if (req.files && req.files.photo) {
-      // guardo la foto en disco y saco el nombre con el que la guardé
-      savedPhoto = await savePhoto(req.files.photo);
+    if (req.files && Object.keys(req.files).length > 0) {
+      // Hay imágenes
+      for (const photoData of Object.values(req.files).slice(0, 3)) {
+        // Guardar la imagen y conseguir el nombre del fichero
+        const photoFile = await savePhoto(photoData);
 
-      const now = new Date();
-      // Meto en la tabla de entries_photos una nueva entrada
-      await connection.query(
-        `
-      INSERT INTO company_photos(uploadDate, photo, company_id)
-      VALUES (?, ?, ?)
-      `,
-        [formatDateToDB(now), savedPhoto, id]
-      );
+        photos.push(photoFile);
+        // Meter una nueva entrada en la tabla entries_photos
+        const now = new Date();
+
+        await connection.query(
+          `
+          INSERT INTO company_photos(uploadDate, photo, company_id)
+          VALUES (?, ?, ?)
+        `,
+          [formatDateToDB(now), photoFile, id]
+        );
+      }
     }
 
     res.send({
       status: "ok",
       data: {
-        photo: savedPhoto,
+        photo: photos,
       },
     });
   } catch (error) {

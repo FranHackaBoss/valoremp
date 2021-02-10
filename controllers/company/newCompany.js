@@ -1,7 +1,7 @@
 const getDB = require("../../db");
 const { generateRandomString, sendMail } = require("../../helpers");
 
-const newUser = async (req, res, next) => {
+const newCompany = async (req, res, next) => {
     let connection;
 
     try {
@@ -9,22 +9,22 @@ const newUser = async (req, res, next) => {
         connection = await getDB();
 
         //Recojo de email y contraseña
-        const { name, surname_1, dni, email, password } = req.body;  
+        const { name, email, password } = req.body;  
 
         //Compruebo que no estén vacios
-        if (!email || !dni ||!password) {
+        if (!email || !password) {
             const error = new Error("Faltan campos obligatorios");
             error.httpStatus = 400;
             throw(error);
         }
 
         //Compruebo que no exista otro usuario con el mismo email
-        const [existingUser] = await connection.query(`
-            SELECT id FROM user WHERE email=?
+        const [existingCompany] = await connection.query(`
+            SELECT id FROM company WHERE email=?
         `, [email]);
 
-        if (existingUser.length > 0) {
-            const error = new Error('Ya existe un usuario con este email');
+        if (existingCompany.length > 0) {
+            const error = new Error('Ya existe una empresa con este email');
             error.httpStatus = 409;
             throw(error);
         }
@@ -32,38 +32,38 @@ const newUser = async (req, res, next) => {
         //Creo un código de registro (contraseña temporal de un solo uso)
         const registrationCode = generateRandomString(40);
         
-        //Mando un email al usuario con el link de confirmación de email
+        //Mando un email a la empresa con el link de confirmación de email
         const emailBody = `
-          Te acabas de registrar en Nesstop. 
-          Pulsa este enlace para validar tu email: ${process.env.PUBLIC_HOST}/user/validate/${registrationCode}
+          Acaba de registrar su empresa en Nesstop. 
+          Pulse este enlace para validar su email: ${process.env.PUBLIC_HOST}/company/validate/${registrationCode}
         `;
 
         await sendMail({
             to: email,
-            subject: 'Activa tu usuario de Nesstop',
+            subject: 'Active su perfil de Nesstop',
             body: emailBody
         });
 
         //Meto al usuario en la BBDD desactivado y con ese código de registro
         await connection.query(`
-            INSERT INTO user(signup_date, name, surname_1, dni, email, password, registrationCode)
-            VALUES(?, ?, ?, ?, ?, SHA2(?, 512), ?)
-        `, [new Date(), name, surname_1, dni, email, password, registrationCode]);
+            INSERT INTO company(signup_date, name, email, password, registrationCode)
+            VALUES(?, ?, ?, SHA2(?, 512), ?)
+        `, [new Date(), name, email, password, registrationCode]);
 
         //Mando un respuesta
         res.send({
             status: "ok",
-            message: "Usuario registrado comprueba tu email para activarlo"
+            message: "Empressa registrada, Compruebe su email para activar su perfil"
         });
         
         res.send({
-            message: 'Registra un nuevo usuario'
+            message: 'Registra una nueva empresa'
         });
-    } catch (error) {
+    } catch(error) {
         next(error);
     } finally {
         if(connection) connection.release();
     }
-};
+}
 
-module.exports = newUser;
+module.exports = newCompany;

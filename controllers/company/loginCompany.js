@@ -1,7 +1,7 @@
 const getDB = require("../../db");
 const jwt = require("jsonwebtoken");
 
-const loginUser = async (req, res, next) => {
+const loginCompany = async (req, res, next) => {
     let connection;
 
     try {
@@ -17,23 +17,23 @@ const loginUser = async (req, res, next) => {
             throw(error);
         }
 
-        //Seleccionar el usuario de la BBDD con ese email y password
-        const [user] = await connection.query(`
-            SELECT id, role, active
-            FROM user
+        //Seleccionar la empresa de la BBDD con ese email y password
+        const [company] = await connection.query(`
+            SELECT id, active
+            FROM company
             WHERE email=? AND password=SHA2(?, 512)
         `, [email, password]);
 
         //Sí no existe asumimos que el email o la password son incorrectos
-        if(user.length === 0) {
+        if(company.length === 0) {
             const error = new Error('El email o la password son incorrectos');
             error.hhtpStatus = 401;
             throw(error);
         }
 
         //Sí existe y no está activo avisamos de que está pendiente de activar
-        if(!user[0].active) {
-            const error = new Error('El usuario existe pero está pendiente de validar. Comprueba tu email');
+        if(!company[0].active) {
+            const error = new Error('La empresa existe pero está pendiente de validar. Compruebe su email');
             error.httpStatus = 401;
             throw(error);
         }
@@ -41,8 +41,7 @@ const loginUser = async (req, res, next) => {
         //Asumimos que el login es correcto
         //Creo el ojeto de información que irá en el token
         const info = {
-            id: user[0].id,
-            role: user[0].role
+            id: company[0].id,
         };
 
         const token = jwt.sign(info, process.env.SECRET, {
@@ -62,4 +61,4 @@ const loginUser = async (req, res, next) => {
     }
 }
 
-module.exports = loginUser;
+module.exports = loginCompany;

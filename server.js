@@ -7,11 +7,12 @@ const fileUpload = require("express-fileupload");
 
 //Controladores
 const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, userVote, addUserComp } = require('./controllers/user');
-const { listCompanies, getCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
+const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
 
 //Middlewares
 const userExists = require("./middlewares/userExists");
 const companyExists = require("./middlewares/companyExists");
+const isActive = require("./middlewares/isActive");
 
 const { PORT } = process.env;
 
@@ -31,7 +32,8 @@ app.use(fileUpload());
 //Static
 app.use(express.static(path.join(__dirname, "static")));
 
-//RUTAS DE LA API usuarios
+//RUTAS DE LA API USUARIOS
+
 //GET -/user
 //Devuelve todos los elementos de la tabla user
 app.get('/user', listUsers);
@@ -52,23 +54,24 @@ app.get('/user/validate/:registrationCode', validateUser);
 //Hacer el login del usuario
 app.post('/user/login', loginUser);
 
-//PUT -/user/:id
+//PUT -/user/:id(token)
 //Edita una entrada en la base de datos
-app.put('/user/:id', userExists, editUser);
+app.put('/user/:id', userExists, isActive, editUser);
 
-//DELETE -/user/:id
+//DELETE -/user/:id(token)
 //Borra una entrada a la BBDD
 app.delete("/user/:id", userExists, deleteUser);
 
-//POST -/user/:id/votes/:company_aspects_id
+//POST -/user/:id/votes/:company_aspects_id(token)
 //Usuario vota una empresa
-app.post('/user/:id/votes/:company_aspects_id', userExists, userVote);
+app.post('/user/:id/votes/:company_aspects_id', userExists, isActive, userVote);
 
-//POST -/user/:id/related/:company_id
+//POST -/user/:id/related/:company_id(token)
 //Añadir relación usuario empresa
 app.post('/user/:id/related/:company_id', userExists, addUserComp);
 
-//Rutas de la API empresas
+//Rutas DE LA API EMPRESAS
+
 //GET -/company
 //Devuelve todos los elementos de la tabla company
 app.get('/company', listCompanies);
@@ -77,32 +80,41 @@ app.get('/company', listCompanies);
 //Devuelve una entradas solo
 app.get('/company/:id', companyExists, getCompany);
 
-//POST -/company/:id/photos
+//POST -/company
+//Nueva entrada tabla empresa
+app.post('/company', newCompany);
+
+//GET -/company/validate/:validationCode
+//Valida una empresa no activada
+app.get('/company/validate/:registrationCode', validateCompany);
+
+//POST -/company/login
+//Hacer el login de la empresa
+app.post('/company/login', loginCompany);
+
+//POST -/company/:id/photos(token)
 //Empresa sube foto
 app.post('/company/:id/photos', companyExists, addCompanyPhotos);
 
-// DELETE - /company/:id/photos/:photoID
+// DELETE - /company/:id/photos/:photoID(token)
 // Borra una foto de la empresa
 app.delete("/company/:id/photos/:photoID", companyExists, deleteCompanyPhoto);
 
-// PUT - /company/:id
+// PUT - /company/:id(token)
 // Edita una empresa en la BBDD
 app.put("/company/:id", companyExists, editCompany);
 
-//POST -/company/:id/aspects
+//POST -/company/:id/aspects(token)
 //Introduce los aspectos a valorar
 app.post("/company/:id/aspects", companyExists, createCompanyAspects);
 
-//PUT -/company/:id/edit_aspects
+//PUT -/company/:id/edit_aspects(token)
 //Editar aspectos a valorar
 app.put("/company/:id/edit_aspects", companyExists, editCompanyAspects);
 
-//DELETE -/company/:id
+//DELETE -/company/:id(token)
 //Borrar empresa
 app.delete("/company/:id", companyExists, deleteCompany);
-
-//POST -/company
-//Nueva entrada tabla empresa
 
 
 //Middleware de error

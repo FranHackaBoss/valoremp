@@ -1,6 +1,6 @@
 const getDB = require("../../db");
 
-const validateUser = async (req, res, next) => {
+const validateCompany = async (req, res, next) => {
     let connection;
 
     try {
@@ -8,21 +8,21 @@ const validateUser = async (req, res, next) => {
 
         const { registrationCode } = req.params;
 
-        //Comprobar que hay un usuario en la BBDD pendiente de validar con ese código
-        const [user] = await connection.query(`
-            SELECT id FROM user WHERE registrationCode=?
+        //Comprobar que hay una empresa en la BBDD pendiente de validar con ese código
+        const [company] = await connection.query(`
+            SELECT id FROM company WHERE registrationCode=?
         `, [registrationCode]);
-        console.log(user);
+        console.log(company);
         //Sí no lo hay enviamos un error
-        if(user.length === 0) {
-            const error = new Error('No hay ningún usuario pendiente de validar con ese código');
+        if(company.length === 0) {
+            const error = new Error('No hay ninguna empresa pendiente de validar con ese código');
             error.httpStatus = 404;
             throw(error);
         }
 
-        //Activar el usuario y quitarle el registrationCode
+        //Activar la empresa y quitarle el registrationCode
         await connection.query(`
-            UPDATE user 
+            UPDATE company 
             SET active=true, registrationCode=NULL
             WHERE registrationCode=?
         `, [registrationCode]);
@@ -31,8 +31,9 @@ const validateUser = async (req, res, next) => {
 
         res.send({
             status: "ok",
-            message: "Usuario validado"
+            message: "Empresa validada"
         });
+        
     } catch(error) {
         next(error);
     } finally {
@@ -40,4 +41,4 @@ const validateUser = async (req, res, next) => {
     }
 }
 
-module.exports = validateUser;
+module.exports = validateCompany;

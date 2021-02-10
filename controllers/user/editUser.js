@@ -5,11 +5,12 @@ const editUser = async (req, res, next) => {
 
     try {
         connection = await getDB();
+        console.log(req.auth.id);
 
         const { id } = req.params;
-
+        
         //Comprobar que los datos mínimos vienen en el body
-        const { name, surname_1, surname_2, bio, city, email, password } = req.body;
+        const { name, surname_1, surname_2, bio, city, dni, email, password } = req.body;
 
         if (!name || !surname_1 || !email || !password) {
             const error = new Error('Faltan campos');
@@ -18,8 +19,8 @@ const editUser = async (req, res, next) => {
         }
         //Hacer la query de SQL
         await connection.query(`
-            UPDATE user SET name=?, surname_1=?, surname_2=?, bio=?, city=?, email=?, password=? WHERE id=?
-        `, [name, surname_1, surname_2, bio, city, email, password, id]);
+            UPDATE IGNORE user SET name=?, surname_1=?, surname_2=?, bio=?, city=?, dni=?, email=?, password=? WHERE id=?
+        `, [name, surname_1, surname_2, bio, city, dni, email, password, id]);
         //Devolver una respuesta
 
         res.send ({
@@ -31,6 +32,7 @@ const editUser = async (req, res, next) => {
                 surname_2,
                 bio,
                 city,
+                dni,
                 email,
                 password,
             }
