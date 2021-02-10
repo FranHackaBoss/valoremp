@@ -45,7 +45,6 @@ async function main() {
                 bio VARCHAR(2048),
                 city VARCHAR(128),
                 email VARCHAR(255) NOT NULL UNIQUE,
-                username VARCHAR(128) NOT NULL UNIQUE,
                 password VARCHAR(512) NOT NULL,
                 avatar VARCHAR(50),
                 active BOOLEAN DEFAULT false,
@@ -147,8 +146,8 @@ async function main() {
         //Introducimos usuarios
         //introducimos un usuario administrador
         await connection.query(`
-            INSERT INTO user (signup_date, name, surname_1, email, username, password, active, role)
-            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', 'fran@gmail.com', 'paquito', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
+            INSERT INTO user (signup_date, name, surname_1, email, password, active, role)
+            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
         `);
 
         //Introducimo usuarios aleatorios
@@ -156,12 +155,11 @@ async function main() {
             const name = faker.name.firstName();
             const lastName = faker.name.lastName();
             const email = faker.internet.email();
-            const username = faker.internet.userName();
             const password = faker.internet.password();
 
             await connection.query(`
-                INSERT INTO user(signup_date, name, surname_1, email, username, password, active)
-                VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${email}', '${username}', SHA2('${password}', 512), true);
+                INSERT INTO user(signup_date, name, surname_1, email, password, active)
+                VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${email}', SHA2('${password}', 512), true);
             `);
         }
 

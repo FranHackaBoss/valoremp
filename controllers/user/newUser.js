@@ -1,73 +1,64 @@
 const getDB = require("../../db");
-const { formatDateToDB, savePhoto} = require("../../helpers");
+const { generateRandomString, sendMail } = require("../../helpers");
 
-const newEntry = async (req, res, next) => {
+const newUser = async (req, res, next) => {
     let connection;
 
     try {
         //Creo conexión a la BBDD
         connection = await getDB();
 
-        //Saco los campos necesarios de req.body
-        const { name, surname_1, surname_2, bio, city, email, username, password } = req.body;
+        //Recojo de email y contraseña
+        const { name, surname_1, email, password } = req.body;  
 
-        console.log(req.body);
-        console.log(req.files);
-
-        //Sí alguno de los campos obligatorios no existe lanzo un error Bad Request
-        if (!name || !surname_1 || !surname_2 || !city || !email || !username || !password) {
+        //Compruebo que no estén vacios
+        if (!email || !password) {
             const error = new Error("Faltan campos obligatorios");
             error.httpStatus = 400;
-            throw error;
+            throw(error);
         }
 
-        //Ejecuto la inserción en la BBDD
-        //Creo un objeto con la fecha actual
-        const now = new Date();
+        //Compruebo que no exista otro usuario con el mismo email
+        const [existingUser] = await connection.query(`
+            SELECT id FROM user WHERE email=?
+        `, [email]);
 
-        const [result] = await connection.query(`
-            INSERT INTO user (signup_date, name, surname_1, surname_2, bio, city, email, username, password)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
-        `, [now, name, surname_1, surname_2, bio, city, email, username, password]);
+        if (existingUser.length > 0) {
+            const error = new Error('Ya existe un usuario con eate email');
+            error.httpStatus = 409;
+            throw(error);
+        }
 
-        //Saco la id de la fila insertada
-        const { insertId } = result;
+        //Creo un código de registro (contraseña temporal de un solo uso)
+        const registrationCode = generateRandomString(40);
         
-        //Procesar las imágenes
-        const photos = [];
+        //Mando un email al usuario con el link de confirmación de email
+        const emailBody = `
+          Te acabas de registrar en Nesstop. 
+          Pulsa este enlace para validar tu email: ${process.env.PUBLIC_HOST}/user/validate/${registrationCode}
+        `;
 
-        if(req.files && Object.keys(req.files).length > 0) {
-            //Hay imagenes
-            for (const photoData of Object.values(req.files).slice(0, 1)) {
-                //Guardar la imagen y conseguir el nombre del fichero
-                const photoFile = await savePhoto(photoData);
-                photos.push(photoFile);
-                //Meter una nueva entrada en la tabla user_photos
-                await connection.query(`
-                    INSERT INTO user_photo(uploadDate, photo, user_id)
-                    VALUES (?, ?, ?)
-                `, [formatDateToDB(now), photoFile, insertId]);
-            }
-        }
+        await sendMail({
+            to: email,
+            subject: 'Activa tu usuario de Nesstop',
+            body: emailBody
+        });
 
+        //Meto al usuario en la BBDD desactivado y con ese código de registro
+        await connection.query(`
+            INSERT INTO user(signup_date, name, surname_1, email, password, registrationCode)
+            VALUES(?, ?, ?, ?, SHA2(?, 512), ?)
+        `, [new Date(), name, surname_1, email, password, registrationCode]);
 
-        //Devuelvo el objeto que representa lo que acabo de insertar en la BBDD
+        //Mando un respuesta
         res.send({
             status: "ok",
-            data: {
-                id: insertId,
-                signup_date: now,
-                name,
-                surname_1,
-                surname_2,
-                bio,
-                city,
-                email,
-                username,
-                password,
-                photos,
-            }
-    });
+            message: "Usuario registrado comprueba tu email para activarlo"
+        });
+        
+        res.send({
+            message: 'Registra un nuevo usuario'
+        });
     } catch (error) {
         next(error);
     } finally {
@@ -75,4 +66,4 @@ const newEntry = async (req, res, next) => {
     }
 };
 
-module.exports = newEntry;
+module.exports = newUser;

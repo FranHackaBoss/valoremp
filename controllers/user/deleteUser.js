@@ -1,5 +1,4 @@
 const getDB = require("../../db");
-const { deletePhoto } = require("../../helpers");
 
 const deleteUser = async (req, res, next) => {
     let connection;
@@ -7,22 +6,6 @@ const deleteUser = async (req, res, next) => {
         connection = await getDB();
 
         const { id } = req.params;
-
-        //Seleccionar la foto relacionada y borrar los ficheros de disco
-        const [photos] = await connection.query(`
-            SELECT photo FROM user_photo WHERE user_id=?
-        `, [id]);
-
-        console.log(photos);
-        //Borrar la posible foto en user_photo
-        await connection.query(`
-            DELETE FROM user_photo WHERE user_id=?
-        `, [id]);
-
-        //y del disco
-        for(const item of photos) {
-            await deletePhoto(item.photo);
-        }
 
         //FUTURO: borrar los posibles entradas en tablas relacionadas
         await connection.query(`

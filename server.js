@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, editUser, deleteUser, userVote, addUserComp } = require('./controllers/user');
+const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, userVote, addUserComp } = require('./controllers/user');
 const { listCompanies, getCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
 
 //Middlewares
@@ -41,8 +41,16 @@ app.get('/user', listUsers);
 app.get('/user/:id', userExists, getUser);
 
 //POST -/user
-//Crea una nueva entrada en la tabla user
+//Crea un usuario pendiente de activar
 app.post('/user', newUser);
+
+//GET -/user/validate/:validationCode
+//Valida un usuario no activado
+app.get('/user/validate/:registrationCode', validateUser);
+
+//POST -/user/login
+//Hacer el login del usuario
+app.post('/user/login', loginUser);
 
 //PUT -/user/:id
 //Edita una entrada en la base de datos

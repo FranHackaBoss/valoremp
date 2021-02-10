@@ -6,500 +6,535 @@
 	},
 	"item": [
 		{
-			"name": "Listar usuarios",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [],
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Usuario",
+			"item": [
+				{
+					"name": "Listar usuarios",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/user/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Oliver",
+									"disabled": true
+								}
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/user/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						""
-					],
-					"query": [
-						{
-							"key": "search",
-							"value": "Oliver",
-							"disabled": true
+				{
+					"name": "Buscar usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user?search=Iglesias&order=id&direction=DESC",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Iglesias"
+								},
+								{
+									"key": "order",
+									"value": "id"
+								},
+								{
+									"key": "direction",
+									"value": "DESC"
+								}
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Buscar usuarios",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/user?search=Iglesias&order=id&direction=DESC",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user"
-					],
-					"query": [
-						{
-							"key": "search",
-							"value": "Iglesias"
-						},
-						{
-							"key": "order",
-							"value": "id"
-						},
-						{
-							"key": "direction",
-							"value": "DESC"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Muestra un usuario",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/user/8?photo",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"8"
-					],
-					"query": [
-						{
-							"key": "photo",
-							"value": null
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Nuevo usuario",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "signup_date",
-							"value": "",
-							"type": "text"
-						},
-						{
-							"key": "name",
-							"value": "fghfg",
-							"type": "text"
-						},
-						{
-							"key": "surname_1",
-							"value": "grillo",
-							"type": "text"
-						},
-						{
-							"key": "surname_2",
-							"value": "lopez",
-							"type": "text"
-						},
-						{
-							"key": "bio",
-							"value": "",
-							"type": "text"
-						},
-						{
-							"key": "email",
-							"value": "drewrzf@GMAIL.COM",
-							"type": "text"
-						},
-						{
-							"key": "city",
-							"value": "Vigo",
-							"type": "text"
-						},
-						{
-							"key": "username",
-							"value": "ooil",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "r6urxbggfga",
-							"type": "text"
-						},
-						{
-							"key": "photo",
-							"value": "",
-							"type": "text"
-						}
-					],
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Editar usuario",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"Julio\",\n    \"surname_1\": \"Iglesias\",\n    \"surname_2\": \"Jacobs\",\n    \"bio\": \"\",\n    \"city\": \"Miami\",\n    \"email\": \"ylosabes@gmail.com\",\n    \"username\": \"fucker1\",\n    \"password\": \"Licensed\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Muestra un usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"8"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/user/25",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"25"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Borrar usuario",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/user/28",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"28"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Votar una empresa",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"aspect1_points\":1,\n    \"aspect2_points\": 3,\n    \"aspect3_points\": 3,\n    \"aspect4_points\": 5,\n    \"aspect5_points\": 3\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Nuevo usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "signup_date",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "fghfg",
+									"type": "text"
+								},
+								{
+									"key": "surname_1",
+									"value": "grillo",
+									"type": "text"
+								},
+								{
+									"key": "surname_2",
+									"value": "lopez",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "drewrzf@GMAIL.COM",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Vigo",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "ooil",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "r6urxbggfga",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"value": "",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/user/1/votes/9",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"1",
-						"votes",
-						"9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Nuevo Usuario Empresa",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"work_position\": \"Director\",\n    \"starting_date\": \"1990-09-01\",\n    \"end_date\": \"2001-09-01\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Editar usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Julio\",\n    \"surname_1\": \"Iglesias\",\n    \"surname_2\": \"Jacobs\",\n    \"bio\": \"\",\n    \"city\": \"Miami\",\n    \"email\": \"ylosabes@gmail.com\",\n    \"username\": \"fucker1\",\n    \"password\": \"Licensed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/user/11",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"11"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/user/6/related/7",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"user",
-						"6",
-						"related",
-						"7"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Listar empresas",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/company/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Buscar empresas",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/company/?search=Parisian",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						""
-					],
-					"query": [
-						{
-							"key": "search",
-							"value": "Parisian"
+				{
+					"name": "Borrar usuario",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/user/12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"12"
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Muestra una empresa",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/company/10",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"10"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Añadir foto empresa",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "photo",
-							"type": "file",
-							"src": "/home/zisko/Downloads/mandalorian.jpeg"
-						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/company/9/photos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"9",
-						"photos"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Borrar foto empresa",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/company/9/photos/20",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"9",
-						"photos",
-						"20"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Editar datos empresa",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"pepito inc\",\n    \"city\": \"A Coruña\",\n    \"description\": \"fabricamos tonterias\",\n    \"email\": \"pepito@gmail.com\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Votar una empresa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"aspect1_points\":1,\n    \"aspect2_points\": 3,\n    \"aspect3_points\": 3,\n    \"aspect4_points\": 5,\n    \"aspect5_points\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/user/1/votes/9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"1",
+								"votes",
+								"9"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/company/10",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"10"
-					]
+				{
+					"name": "Nuevo Usuario Empresa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"work_position\": \"Director\",\n    \"starting_date\": \"1990-09-01\",\n    \"end_date\": \"2001-09-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/user/6/related/7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"user",
+								"6",
+								"related",
+								"7"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Empresa crea aspectos de valoración",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"aspect1\": \"Ambiente de trabajo\",\n    \"aspect2\": \"Jefes\",\n    \"aspect3\":\"Horarios\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n    }",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Empresa",
+			"item": [
+				{
+					"name": "Listar empresas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/company/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								""
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/company/4/aspects",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"4",
-						"aspects"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Modificar aspectos de valoración",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"aspect1\": \"a ver si va\",\n    \"aspect2\": \"\",\n    \"aspect3\": \"\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Buscar empresas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/company/?search=Parisian",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Parisian"
+								}
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:3000/company/3/edit_aspects",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"company",
-						"3",
-						"edit_aspects"
-					]
+				{
+					"name": "Muestra una empresa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/company/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Añadir foto empresa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/home/zisko/Downloads/starwars.jpeg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:3000/company/10/photos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"10",
+								"photos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar foto empresa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/company/9/photos/20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"9",
+								"photos",
+								"20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editar datos empresa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"pepito inc\",\n    \"city\": \"A Coruña\",\n    \"description\": \"fabricamos tonterias\",\n    \"email\": \"pepito@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/company/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Empresa crea aspectos de valoración",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"aspect1\": \"Ambiente de trabajo\",\n    \"aspect2\": \"Jefes\",\n    \"aspect3\":\"Horarios\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/company/4/aspects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"4",
+								"aspects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modificar aspectos de valoración",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"aspect1\": \"a ver si va\",\n    \"aspect2\": \"\",\n    \"aspect3\": \"\",\n    \"aspect4\": \"\",\n    \"aspect5\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/company/3/edit_aspects",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"3",
+								"edit_aspects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Borrar empresa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/company/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"company",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Nueva empresa",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }

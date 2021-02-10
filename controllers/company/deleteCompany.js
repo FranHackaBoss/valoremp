@@ -14,16 +14,18 @@ const deleteCompany = async (req, res, next) => {
         `, [id]);
 
         console.log(photos);
-        //Borrar la posible foto en company_photos
-        await connection.query(`
-            DELETE FROM company_photos WHERE company_id=?
-        `, [id]);
 
-        //y del disco
-        for(const item of photos) {
-            await deletePhoto(item.photo);
+        if(photos.length > 0) {
+            //Borrar la posible foto en company_photos
+            await connection.query(`
+                DELETE FROM company_photos WHERE company_id=?
+            `, [id]);
+        
+            //y del disco
+            for(const item of photos) {
+                await deletePhoto(item.photo);
+            }
         }
-
         //FUTURO: borrar los posibles entradas en tablas relacionadas
         await connection.query(`
             DELETE FROM user_company WHERE company_id=?

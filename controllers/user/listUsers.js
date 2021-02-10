@@ -8,7 +8,7 @@ const listUsers = async (req, res, next) => {
         //Saco querystring                                                          
         const { search, order, direction } = req.query;
 
-        const validOrderFields = ['id', 'name', 'surname_1', 'surname_2', 'city', 'email', 'username'];
+        const validOrderFields = ['id', 'name', 'surname_1', 'surname_2', 'city', 'email'];
         const validOrderDirection = ['DESC', 'ASC'];
 
         const orderBy = validOrderFields.includes(order) ? order : 'id';
@@ -18,18 +18,18 @@ const listUsers = async (req, res, next) => {
 
         if (search) {
           [results] = await connection.query(`
-            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password
+            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.password
             FROM user
             WHERE user.city LIKE ? OR user.surname_1 LIKE ?
-            GROUP BY user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password
+            GROUP BY user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.password
             ORDER BY ${orderBy} ${orderDirection};
             `, [`%${search}%`, `%${search}%`]);
         } else {
            //Leo las entradas de la tabla user
            [results] = await connection.query(`
-            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password
+            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.password
             FROM user 
-            GROUP BY user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.username, user.password
+            GROUP BY user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.password
             ORDER BY ${orderBy} ${orderDirection};
            `,);
         }
