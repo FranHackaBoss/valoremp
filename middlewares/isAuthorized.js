@@ -1,7 +1,7 @@
 const getDB = require("../db");
 const jwt = require("jsonwebtoken");
 
-const isActive = async (req, res, next) => {
+const isAuthorized = async (req, res, next) => {
     let connection;
 
     try {
@@ -44,4 +44,4 @@ const isActive = async (req, res, next) => {
     }
 };
 
-module.exports = isActive;
+module.exports = isAuthorized;

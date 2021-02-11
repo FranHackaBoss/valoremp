@@ -9,13 +9,6 @@ const userVote = async (req, res, next) => {
         const { id, company_id } = req.params;
         const { evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points } = req.body;
 
-        //Compruebo que el id del usuario que queremos modificar se corresponde con el token
-        if(+id !== req.auth.id) {
-            const error = new Error('El token no es válido');
-            error.httpStatus = 401;
-            throw error;
-        }
-
         //Compruebo que existe relación entre el usuario y la empresa
         const [relationship] = await connection.query(`
             SELECT id 

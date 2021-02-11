@@ -1,13 +1,13 @@
-const getDB = require("../../db");
+const getDB = require("../db");
 
-const deleteUserPhoto = async (req, res, next) => {
+const  = async (req, res, next) => {
     let connection;
 
     try {
         connection = await getDB();
 
         res.send({
-            message: 'Borrar foto de usuario'
+            message: ''
         })
     } catch(error) {
         next(error);
@@ -16,4 +16,4 @@ const deleteUserPhoto = async (req, res, next) => {
     }
 }
 
-module.exports = deleteUserPhoto;
+module.exports = ;

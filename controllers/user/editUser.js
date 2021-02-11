@@ -7,13 +7,6 @@ const editUser = async (req, res, next) => {
         connection = await getDB();
 
         const { id } = req.params;
-
-        //Compruebo que el id del usuario que queremos modificar se corresponde con el token o es administrador
-        if(+id !== req.auth.id && req.auth.role !== 'admin') {
-            const error = new Error('El token no es válido');
-            error.httpStatus = 401;
-            throw error;
-        }
         
         //Comprobar que los datos mínimos vienen en el body
         const { name, surname_1, surname_2, bio, city, dni, email } = req.body;
