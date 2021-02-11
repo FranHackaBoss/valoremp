@@ -9,6 +9,9 @@ const isActive = async (req, res, next) => {
 
         const { authorization } = req.headers;
 
+        //La cabecera de autorización puede tener otro formato
+
+
         //Sí no hay authorization devuelvo un error
         if(!authorization) {
             const error = new Error('Falta la cabecera de autorización');
@@ -27,12 +30,12 @@ const isActive = async (req, res, next) => {
             throw(error);
         }
 
+        //Hacer comprobaciones de seguridad extra
+
         //Inyectamos en la request la información del token
         req.auth = tokenInfo;
 
         //Continúo
-        
-
        next() 
     } catch(error) {
         next(error);

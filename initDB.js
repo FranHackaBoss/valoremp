@@ -74,6 +74,28 @@ async function main() {
                 CONSTRAINT user_company CHECK (starting_date < end_date)
             );
         `);
+
+        //Creamos tabla evaluation
+
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS evaluation (
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                company_id BIGINT NOT NULL,
+                user_id BIGINT NOT NULL,
+                evaluation_date DATETIME,
+                aspect1_points TINYINT NOT NULL,
+                aspect2_points TINYINT,
+                aspect3_points TINYINT,
+                aspect4_points TINYINT,
+                aspect5_points TINYINT,
+                FOREIGN KEY (company_id)
+                    REFERENCES company(id),
+                FOREIGN KEY (user_id)
+                    REFERENCES user(id),
+                CONSTRAINT evaluation CHECK (aspect1_points >= 1 AND aspect1_points <= 10 AND aspect2_points >= 1 AND aspect2_points <= 10 AND aspect3_points >= 1 AND aspect3_points <= 10 AND aspect4_points >= 1 AND aspect4_points <= 10 AND aspect5_points >= 1 AND aspect5_points <= 10)
+            );
+        `);
+
         
         //Creamos tabla company_aspects
         
@@ -88,28 +110,6 @@ async function main() {
                 aspect5 VARCHAR(2048),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id)
-            );
-        `);
-
-        //Creamos tabla evaluation
-        
-        await connection.query(`
-            CREATE TABLE evaluation (
-                id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                company_aspects_id BIGINT NOT NULL,
-                user_id BIGINT NOT NULL,
-                evaluation_date DATETIME,
-                aspect1_points TINYINT NOT NULL,
-                aspect2_points TINYINT,
-                aspect3_points TINYINT,
-                aspect4_points TINYINT,
-                aspect5_points TINYINT,
-                text_review VARCHAR(2048),
-                FOREIGN KEY (company_aspects_id)
-                    REFERENCES company_aspects(id),
-                FOREIGN KEY (user_id)
-                    REFERENCES user(id),
-                CONSTRAINT evaluation_CK1 CHECK (aspect1_points >= 1 AND aspect1_points <= 10 AND aspect2_points >= 1 AND aspect2_points <= 10 AND aspect3_points >= 1 AND aspect3_points <= 10 AND aspect4_points >= 1 AND aspect4_points <= 10 AND aspect5_points >= 1 AND aspect5_points <= 10)
             );
         `);
 
@@ -173,11 +173,21 @@ async function main() {
         for (let i = 0; i < users; i++) {
 
             await connection.query(`
-                INSERT INTO user_company(company_id ,user_id ,work_position ,starting_date ,end_date)
+                INSERT INTO user_company(company_id ,user_id, work_position ,starting_date ,end_date)
                 VALUES ('${random(1, 10)}', '${random(2, users+1)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}');
             `);
         }
 
+        //Introducimo datos en evalution
+
+        for (let i = 0; i < companies; i++) {
+            const now = new Date();
+
+            await connection.query(`
+                INSERT INTO evaluation(company_id ,user_id, evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points)
+                VALUES ('${random(1, 10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}');
+            `);
+        }
 
         // Introducimos aspectos a valorar
 
@@ -185,17 +195,6 @@ async function main() {
             await connection.query(`
                 INSERT INTO company_aspects(company_id, aspect1, aspect2, aspect3, aspect4, aspect5)
                 VALUES ('${random(1, 10)}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}', '${faker.random.word()}');
-            `);
-        }
-
-        //Introducimos notas
-
-        for (let i = 0; i < users; i++) {
-            const now = new Date();
-
-            await connection.query(`
-                INSERT INTO evaluation(user_id ,company_aspects_id, evaluation_date , aspect1_points, aspect2_points ,aspect3_points, aspect4_points, aspect5_points, text_review)
-                VALUES ('${random(2,users+1)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${faker.random.words()}');
             `);
         }
 

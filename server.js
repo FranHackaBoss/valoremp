@@ -12,7 +12,7 @@ const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, ad
 //Middlewares
 const userExists = require("./middlewares/userExists");
 const companyExists = require("./middlewares/companyExists");
-const isActive = require("./middlewares/isActive");
+const isAuthorized = require("./middlewares/isAuthorized");
 
 const { PORT } = process.env;
 
@@ -55,16 +55,16 @@ app.get('/user/validate/:registrationCode', validateUser);
 app.post('/user/login', loginUser);
 
 //PUT -/user/:id(token)
-//Edita una entrada en la base de datos
-app.put('/user/:id', userExists, isActive, editUser);
+//Edita un usuario en la base de datos
+app.put('/user/:id', isAuthorized, userExists, editUser);
 
 //DELETE -/user/:id(token)
-//Borra una entrada a la BBDD
+//Borra un usuario a la BBDD
 app.delete("/user/:id", userExists, deleteUser);
 
-//POST -/user/:id/votes/:company_aspects_id(token)
+//POST -/user/:id/votes/:company_id(token)
 //Usuario vota una empresa
-app.post('/user/:id/votes/:company_aspects_id', userExists, isActive, userVote);
+app.post('/user/:id/votes/:company_id', isAuthorized, userExists, userVote);
 
 //POST -/user/:id/related/:company_id(token)
 //Añadir relación usuario empresa
