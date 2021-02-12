@@ -31,7 +31,8 @@ async function main() {
                 password VARCHAR(512) NOT NULL,
                 logo VARCHAR(50),
                 active BOOLEAN DEFAULT false,
-                registrationCode VARCHAR(100)
+                registrationCode VARCHAR(100),
+                lastAuthUpdate DATETIME DEFAULT NULL
             );
         `);
 
@@ -52,7 +53,8 @@ async function main() {
                 avatar VARCHAR(50),
                 active BOOLEAN DEFAULT false,
                 registrationCode VARCHAR(100),
-                role ENUM("admin", "normal") DEFAULT "normal" NOT NULL
+                role ENUM("admin", "normal") DEFAULT "normal" NOT NULL,
+                lastAuthUpdate DATETIME DEFAULT NULL
             );
         `);
         
@@ -67,6 +69,7 @@ async function main() {
                 work_position VARCHAR(255),
                 starting_date DATE NOT NULL,
                 end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                active BOOLEAN DEFAULT false,
                 FOREIGN KEY (company_id)
                     REFERENCES company(id),
                 FOREIGN KEY (user_id)
@@ -142,15 +145,15 @@ async function main() {
             const password = faker.internet.password();
 
             await connection.query(`
-                INSERT INTO company(signup_date, name, email, password, active)
-                VALUES ('${formatDateToDB(now)}', '${company}', '${email}', SHA2('${password}', 512), true);
+                INSERT INTO company(signup_date, name, email, password, active, lastAuthUpdate)
+                VALUES ('${formatDateToDB(now)}', '${company}', '${email}', SHA2('${password}', 512), true, '1990-09-01');
             `)
         }
         //Introducimos usuarios
         //introducimos un usuario administrador
         await connection.query(`
-            INSERT INTO user (signup_date, name, surname_1, dni, email, password, active, role)
-            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', '35698542X', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin');
+            INSERT INTO user (signup_date, name, surname_1, dni, email, password, active, role, lastAuthUpdate)
+            VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', '35698542X', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin', '1990-09-01');
         `);
 
         //Introducimo usuarios aleatorios
@@ -173,8 +176,8 @@ async function main() {
         for (let i = 0; i < users; i++) {
 
             await connection.query(`
-                INSERT INTO user_company(company_id ,user_id, work_position ,starting_date ,end_date)
-                VALUES ('${random(1, 10)}', '${random(2, users+1)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}');
+                INSERT INTO user_company(company_id ,user_id, work_position ,starting_date ,end_date, active)
+                VALUES ('${random(1, 10)}', '${random(2, users+1)}', '${faker.name.jobTitle()}', '1990-09-01', '${formatDateToDB(now)}', true);
             `);
         }
 

@@ -31,7 +31,7 @@ const addCompanyPhotos = async (req, res, next) => {
 
     if (req.files && Object.keys(req.files).length > 0) {
       // Hay imágenes
-      for (const photoData of Object.values(req.files).slice(0, 3)) {
+      for (const photoData of Object.values(req.files).slice(0, 10)) {
         // Guardar la imagen y conseguir el nombre del fichero
         const photoFile = await savePhoto(photoData);
 

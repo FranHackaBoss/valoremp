@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote } = require('./controllers/user');
+const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword } = require('./controllers/user');
 const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
 
 //Middlewares
@@ -41,7 +41,7 @@ app.get('/user', listUsers);
 
 //GET -/user/:id
 //Devuelve una entradas solo
-app.get('/user/:id', userExists, getUser);
+app.get('/user/:id', isAuthorized, userExists, getUser);
 
 //POST -/user
 //Crea un usuario pendiente de activar
@@ -75,6 +75,10 @@ app.post('/user/:id/votes/:company_id', isAuthorized, userExists, canEdit, userV
 //Usuario edita votación
 app.put('/user/:id/votes/:company_id', isAuthorized, userExists, canEdit, userEditVote);
 
+//PUT -/user/:id/password
+//Usuario edita contraseña
+app.put('/user/:id/password', isAuthorized, userExists, canEdit, editUserPassword);
+
 //Rutas DE LA API EMPRESAS
 
 //GET -/company
@@ -83,7 +87,7 @@ app.get('/company', listCompanies);
 
 //GET -/company/:id
 //Devuelve una entradas solo
-app.get('/company/:id', companyExists, getCompany);
+app.get('/company/:id', isAuthorized, companyExists, getCompany);
 
 //POST -/company
 //Nueva entrada tabla empresa

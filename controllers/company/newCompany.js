@@ -53,7 +53,7 @@ const newCompany = async (req, res, next) => {
         //Mando un respuesta
         res.send({
             status: "ok",
-            message: "Empressa registrada, Compruebe su email para activar su perfil"
+            message: "Empresa registrada, Compruebe su email para activar su perfil"
         });
         
         res.send({

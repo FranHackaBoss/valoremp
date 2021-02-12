@@ -8,5 +8,6 @@ const deleteUser = require("./deleteUser");
 const userVote = require("./userVote");
 const addUserComp = require("./addUserComp");
 const userEditVote = require("./userEditVote");
+const editUserPassword = require("./editUserPassword");
 
-module.exports = { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote };
+module.exports = { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword };

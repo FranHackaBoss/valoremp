@@ -31,13 +31,9 @@ const deleteCompany = async (req, res, next) => {
             DELETE FROM user_company WHERE company_id=?
         `, [id]);
 
-        const [evaluation_company_id] = await connection.query(`
-            SELECT id FROM company_aspects WHERE company_id=?
-        `, [id]);
-        
         await connection.query(`
-            DELETE FROM evaluation WHERE company_aspects_id = ${evaluation_company_id[0].id}
-        `);
+            DELETE FROM evaluation WHERE company_id =?
+        `, [id]);
 
         await connection.query(`
             DELETE FROM company_aspects WHERE company_id=?

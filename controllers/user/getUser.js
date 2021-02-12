@@ -9,18 +9,33 @@ const getUser = async (req, res, next) => {
         //Saco el id de los parámetros de ruta
         const { id } = req.params;
         
-        //Hago la query
-        const [result] = await connection.query(`
-            SELECT user.signup_date, user.id, user.name, user.surname_1, user.surname_2, user.bio, user.city, user.email, user.password
-            FROM user
-            WHERE user.id = ?
+        //Saco la información del usuario
+        const [user] = await connection.query(`
+        SELECT id, signup_date, name, surname_1, surname_2, city, email, avatar, role
+        FROM user
+        WHERE id=?
         `, [id]);
-        
-        
+        console.log(user);
+        //Creo la respuesta básica
+        const userInfo = {
+            avatar: user[0].avatar,
+            name: user[0].name,
+            surname_1: user[0].surname_1
+        }
+
+        //Sí el usuario soliciatdo coincide con el del token añado a la respuesta básica los datos privados
+        if(user[0].id === req.auth.id || req.auth.role === 'admin') {
+            userInfo.surname_2 = user[0].surname_2;
+            userInfo.date = user[0].signup_date;
+            userInfo.city = user[0].city;
+            userInfo.email = user[0].email;
+            userInfo.role = user[0].role;
+        }
+
         //Devuelvo un json con las entradas
         res.send({
             status: "ok",
-            data: result
+            data: userInfo
         });
     } catch (error) {
         //Lo mandamos al middleware de error
