@@ -9,5 +9,7 @@ const userVote = require("./userVote");
 const addUserComp = require("./addUserComp");
 const userEditVote = require("./userEditVote");
 const editUserPassword = require("./editUserPassword");
+const forgotUserPassword = require("./forgotUserPassword");
+const validateNewPassword = require("./validateNewPassword");
 
-module.exports = { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword };
+module.exports = { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword, forgotUserPassword, validateNewPassword };

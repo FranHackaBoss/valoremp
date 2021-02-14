@@ -10,7 +10,7 @@ const editUser = async (req, res, next) => {
         const { id } = req.params;
         
         //Sacamos name y email
-        const { name, surname_1, surname_2, bio, city, dni, email } = req.body;
+        const { name, surname, bio, city, dni, email } = req.body;
 
         //Sacamos la información actual del usuario en la BBDD
         const [currentUser] = await connection.query(`
@@ -64,9 +64,9 @@ const editUser = async (req, res, next) => {
             //Actualizamos datos finales
             await connection.query(`
                 UPDATE user
-                SET name=?, surname_1=?, surname_2=?, bio=?, city=?, dni=?, email=?, lastAuthUpdate=?, active=0, registrationCode=?
+                SET name=?, surname=?, bio=?, city=?, dni=?, email=?, lastAuthUpdate=?, active=0, registrationCode=?
                 WHERE id=?
-            `, [name, surname_1, surname_2, bio, city, dni, email, new Date(), registrationCode, id]);
+            `, [name, surname, bio, city, dni, email, new Date(), registrationCode, id]);
 
             //Damos una respuesta
             res.send ({
@@ -76,9 +76,9 @@ const editUser = async (req, res, next) => {
         } else {
             await connection.query(`
                 UPDATE user
-                SET name=?, surname_1=?, surname_2=?, bio=?, city=?, dni=?, email=?
+                SET name=?, surname=?, bio=?, city=?, dni=?, email=?
                 WHERE id=?
-            `, [name, surname_1, surname_2, bio, city, dni, email, id]);
+            `, [name, surname, bio, city, dni, email, id]);
 
             res.send ({
                 status: "ok",

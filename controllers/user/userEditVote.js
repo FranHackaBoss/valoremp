@@ -44,14 +44,37 @@ const  userEditVote = async (req, res, next) => {
             throw(error);
         }
 
+        const result = aspect1_points + aspect2_points + aspect3_points +aspect4_points +aspect5_points;
+        console.log(result);
+        //Calculo la ponderación en función de los años del usuario en la empresa
+        const [startDate] = await connection.query(`
+            SELECT starting_date 
+            FROM user_company
+            WHERE user_id=? AND company_id=?
+        `, [id, company_id]);
+        
+        const [endDate] = await connection.query(`
+            SELECT end_date 
+            FROM user_company
+            WHERE user_id=? AND company_id=?
+        `, [id, company_id]);
+
+        
+        console.log(startDate[0].starting_date, endDate[0].end_date);
+
+        const timeGap = endDate[0].end_date.getFullYear() - startDate[0].starting_date.getFullYear();
+        console.log(result);
+
+        const finalScore = Math.round(result * (1 + (timeGap * 0.1)));
+
         //Hacer la query de SQL
         const now = new Date();
 
         await connection.query(`
             UPDATE evaluation 
-            SET evaluation_date=?, aspect1_points=?, aspect2_points=?, aspect3_points=?, aspect4_points=?, aspect5_points=? 
+            SET evaluation_date=?, aspect1_points=?, aspect2_points=?, aspect3_points=?, aspect4_points=?, aspect5_points=?, total=?
             WHERE user_id=? AND company_id=?
-        `, [now, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points, id, company_id]);
+        `, [now, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points, finalScore, id, company_id]);
         //Devolver una respuesta
 
         res.send ({
@@ -63,7 +86,8 @@ const  userEditVote = async (req, res, next) => {
                 aspect2_points,
                 aspect3_points,
                 aspect4_points,
-                aspect5_points
+                aspect5_points,
+                total: finalScore
             }
         });
 

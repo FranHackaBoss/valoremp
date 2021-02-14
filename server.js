@@ -6,8 +6,8 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 
 //Controladores
-const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword } = require('./controllers/user');
-const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany, validateUserCompany } = require('./controllers/company');
+const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword, forgotUserPassword, validateNewPassword } = require('./controllers/user');
+const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany, validateUserCompany, forgotCompanyPassword, validateCompanyPassword } = require('./controllers/company');
 
 //Middlewares
 const userExists = require("./middlewares/userExists");
@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, "static")));
 
 //GET -/user
 //Devuelve todos los elementos de la tabla user
-app.get('/user', listUsers);
+app.get('/user', isAuthorized, listUsers);
 
 //GET -/user/:id
 //Devuelve una entradas solo
@@ -78,6 +78,14 @@ app.put('/user/:id/votes/:company_id', isAuthorized, userExists, canEdit, userEd
 //PUT -/user/:id/password
 //Usuario edita contraseña
 app.put('/user/:id/password', isAuthorized, userExists, canEdit, editUserPassword);
+
+//GET -/user/:id/forgottenUserPassword
+//Cambiar contraseña olvidada
+app.post('/user/:id/forgottenUserPassword', isAuthorized, userExists, canEdit, forgotUserPassword);
+
+//PUT -/user/:id/forgottenUserPassword/validationCode
+//Validar nueva contraseña
+app.put('/user/:id/forgottenUserPassword/:registrationCode', isAuthorized, userExists, canEdit, validateNewPassword);
 
 //Rutas DE LA API EMPRESAS
 
@@ -128,6 +136,14 @@ app.delete("/company/:id", isAuthorized, companyExists, canEdit, deleteCompany);
 //GET -/company/validateUserCompany/:validationCode
 //Valida un usuario no activado
 app.get('/validateUserCompany/:registrationCode', validateUserCompany);
+
+//GET -/company/:id/forgottenCompanyPassword
+//Cambiar contraseña olvidada
+app.post('/company/:id/forgottenCompanyPassword', isAuthorized, companyExists, canEdit, forgotCompanyPassword);
+
+//PUT -/company/:id/forgottenCompanyPassword/validationCode
+//Validar nueva contraseña
+app.put('/company/:id/forgottenCompanyPassword/:registrationCode', isAuthorized, companyExists, canEdit, validateCompanyPassword);
 
 //Middleware de error
 app.use((error, req, res, next) => {

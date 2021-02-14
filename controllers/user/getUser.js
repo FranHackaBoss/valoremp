@@ -11,7 +11,7 @@ const getUser = async (req, res, next) => {
         
         //Saco la información del usuario
         const [user] = await connection.query(`
-        SELECT id, signup_date, name, surname_1, surname_2, city, email, avatar, role
+        SELECT id, signup_date, name, surname, city, email, avatar, role
         FROM user
         WHERE id=?
         `, [id]);
@@ -20,12 +20,11 @@ const getUser = async (req, res, next) => {
         const userInfo = {
             avatar: user[0].avatar,
             name: user[0].name,
-            surname_1: user[0].surname_1
         }
 
-        //Sí el usuario soliciatdo coincide con el del token añado a la respuesta básica los datos privados
+        //Sí el usuario solicitado coincide con el del token añado a la respuesta básica los datos privados
         if(user[0].id === req.auth.id || req.auth.role === 'admin') {
-            userInfo.surname_2 = user[0].surname_2;
+            userInfo.surname = user[0].surname;
             userInfo.date = user[0].signup_date;
             userInfo.city = user[0].city;
             userInfo.email = user[0].email;
