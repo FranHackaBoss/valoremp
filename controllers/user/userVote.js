@@ -41,6 +41,19 @@ const userVote = async (req, res, next) => {
             throw error;
         }
 
+        //Compruebo que el usuario puede votar
+        const [userStatus] = await connection.query(`
+            SELECT active
+            FROM user_company
+            WHERE user_id=?
+        `, [id]);
+        console.log(userStatus);
+        if(userStatus[0].active !== 1) {
+            const error = new Error('La empresa no ha confirmado la relación, todavía no puede votar');
+            error.httpStatus = 403;
+            throw error;
+        }
+
         //Si falta alguno de los campo obligatorios lanzo un Bad request
         if (!id || !company_id || !aspect1_points) {
             const error = new Error("Faltan campos obligatorios");
@@ -48,20 +61,8 @@ const userVote = async (req, res, next) => {
             throw error;
         }
 
-        //Ejecuto la inserción en la BBDD
-        const now = new Date();
-
-        await connection.query(`
-            INSERT INTO evaluation (company_id, user_id, evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points)
-            VALUES(?, ?, ?, ?, ?, ?, ?, ?);
-        `, [company_id, id, now, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points]);
-
-        const [results] = await connection.query(`
-            SELECT SUM(aspect1_points + aspect2_points + aspect3_points + aspect4_points + aspect5_points) AS total
-            FROM evaluation
-            WHERE user_id=? AND company_id=?
-            `, [id, company_id]);
-
+        const result = aspect1_points + aspect2_points + aspect3_points +aspect4_points +aspect5_points;
+        console.log(result);
         //Calculo la ponderación en función de los años del usuario en la empresa
         const [startDate] = await connection.query(`
             SELECT starting_date 
@@ -78,10 +79,18 @@ const userVote = async (req, res, next) => {
         
         console.log(startDate[0].starting_date, endDate[0].end_date);
 
-        let timeGap = endDate[0].end_date.getFullYear() - startDate[0].starting_date.getFullYear();
-        console.log(results[0].total);
+        const timeGap = endDate[0].end_date.getFullYear() - startDate[0].starting_date.getFullYear();
+        console.log(result);
 
-        let finalScore = Math.round(results[0].total * (1 + (timeGap * 0.1)));
+        const finalScore = Math.round(result * (1 + (timeGap * 0.1)));
+
+        //Ejecuto la inserción en la BBDD
+        const now = new Date();
+
+        await connection.query(`
+            INSERT INTO evaluation (company_id, user_id, evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points, total)
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `, [company_id, id, now, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points, finalScore]);
 
         res.send({
             status: "ok",
@@ -94,8 +103,7 @@ const userVote = async (req, res, next) => {
                 aspect3_points,
                 aspect4_points,
                 aspect5_points,
-                total: results,
-                final: finalScore
+                total: finalScore
             }
         });
     } catch(error) {

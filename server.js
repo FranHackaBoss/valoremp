@@ -7,7 +7,7 @@ const fileUpload = require("express-fileupload");
 
 //Controladores
 const { listUsers, getUser, newUser, validateUser, loginUser, editUser, deleteUser, addUserComp, userVote, userEditVote, editUserPassword } = require('./controllers/user');
-const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany } = require('./controllers/company');
+const { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany, validateUserCompany } = require('./controllers/company');
 
 //Middlewares
 const userExists = require("./middlewares/userExists");
@@ -125,6 +125,9 @@ app.put("/company/:id/edit_aspects", isAuthorized, companyExists, canEdit, editC
 //Borrar empresa
 app.delete("/company/:id", isAuthorized, companyExists, canEdit, deleteCompany);
 
+//GET -/company/validateUserCompany/:validationCode
+//Valida un usuario no activado
+app.get('/validateUserCompany/:registrationCode', validateUserCompany);
 
 //Middleware de error
 app.use((error, req, res, next) => {

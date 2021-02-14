@@ -1,4 +1,5 @@
 const getDB = require("../../db");
+const { generateRandomString, sendMail } = require("../../helpers");
 
 const addUserComp = async (req, res, next) => {
     let connection;
@@ -30,29 +31,55 @@ const addUserComp = async (req, res, next) => {
             throw error;
         }
 
+        //Obtenemos el email de la empresa
+        const [companyEmail] = await connection.query(`
+            SELECT email
+            FROM company
+            WHERE id=?
+        `, [company_id]);
+        console.log(companyEmail);
+        //Obtnemos datos de usuario
+        const [userData] = await connection.query(`
+            SELECT name, surname, dni
+            FROM user
+            WHERE id=?
+        `, [id]);
+
+        console.log(userData);
+
+        //Creamos un código de registro
+        const registrationCode = generateRandomString(40);
+
+        //Mando un email al usuario con el link de confirmación de email
+        const emailBody = `
+            ${userData[0].name} ${userData[0].surname} con DNI: ${userData[0].dni}.
+            Acaba de indicarnos que ha trabajado en su empresa y desearía añadir una valoración. 
+            En caso afirmativo haga click en el siguiente enlace: ${process.env.PUBLIC_HOST}/validateUserCompany/${registrationCode} .
+            De lo contrario ignore este email.
+        `;
+
+        await sendMail({
+            to: companyEmail[0].email,
+            subject: 'Usuario desea valorar su empresa',
+            body: emailBody
+        });
+
         //Ejecuto la inserción en la BBDD
-        if (!end_date) {
+            if (!end_date) {
             const now = new Date();
             end_date = now;
-        }
-        await connection.query(`
-            INSERT INTO user_company (company_id, user_id, work_position, starting_date, end_date)
-            VALUES(?, ?, ?, ?, ?);
-        `, [company_id, id, work_position, starting_date, end_date]);
-
-        res.send({
-            status: "ok",
-            message: 'Nueva relación añadida',
-            data: {
-                company_id,
-                id,
-                work_position,
-                starting_date,
-                end_date
             }
-        })
+            await connection.query(`
+             INSERT INTO user_company (company_id, user_id, work_position, starting_date, end_date, registrationCode)
+             VALUES(?, ?, ?, ?, ?, ?);
+            `, [company_id, id, work_position, starting_date, end_date, registrationCode]);
+
+            res.send({
+            status: "ok",
+            message: "Usuario vinculado con exito"
+            });
     } catch(error) {
-        next(error);
+       next(error);
     } finally {
         if(connection) connection.release();
     }

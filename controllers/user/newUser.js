@@ -9,7 +9,7 @@ const newUser = async (req, res, next) => {
         connection = await getDB();
 
         //Recojo de email y contraseña
-        const { name, surname_1, dni, email, password } = req.body;  
+        const { name, surname, dni, email, password } = req.body;  
 
         //Compruebo que no estén vacios
         if (!email || !dni ||!password) {
@@ -46,9 +46,9 @@ const newUser = async (req, res, next) => {
 
         //Meto al usuario en la BBDD desactivado y con ese código de registro
         await connection.query(`
-            INSERT INTO user(signup_date, name, surname_1, dni, email, password, registrationCode)
+            INSERT INTO user(signup_date, name, surname, dni, email, password, registrationCode)
             VALUES(?, ?, ?, ?, ?, SHA2(?, 512), ?)
-        `, [new Date(), name, surname_1, dni, email, password, registrationCode]);
+        `, [new Date(), name, surname, dni, email, password, registrationCode]);
 
         //Mando un respuesta
         res.send({

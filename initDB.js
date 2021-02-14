@@ -43,8 +43,7 @@ async function main() {
                 id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 signup_date DATETIME NOT NULL,
                 name VARCHAR(128) NOT NULL,
-                surname_1 VARCHAR(128) NOT NULL,
-                surname_2 VARCHAR(128),
+                surname VARCHAR(128) NOT NULL,
                 bio VARCHAR(2048),
                 city VARCHAR(128),
                 dni VARCHAR(128) NOT NULL UNIQUE,
@@ -70,6 +69,7 @@ async function main() {
                 starting_date DATE NOT NULL,
                 end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 active BOOLEAN DEFAULT false,
+                registrationCode VARCHAR(100),
                 FOREIGN KEY (company_id)
                     REFERENCES company(id),
                 FOREIGN KEY (user_id)
@@ -91,6 +91,7 @@ async function main() {
                 aspect3_points TINYINT,
                 aspect4_points TINYINT,
                 aspect5_points TINYINT,
+                total TINYINT,
                 FOREIGN KEY (company_id)
                     REFERENCES company(id),
                 FOREIGN KEY (user_id)
@@ -152,7 +153,7 @@ async function main() {
         //Introducimos usuarios
         //introducimos un usuario administrador
         await connection.query(`
-            INSERT INTO user (signup_date, name, surname_1, dni, email, password, active, role, lastAuthUpdate)
+            INSERT INTO user (signup_date, name, surname, dni, email, password, active, role, lastAuthUpdate)
             VALUES ('${formatDateToDB(now)}', 'Fran', 'Iglesias', '35698542X', 'fran@gmail.com', SHA2(${process.env.ADMIN_PASSWORD}, 512), true, 'admin', '1990-09-01');
         `);
 
@@ -165,7 +166,7 @@ async function main() {
             const password = faker.internet.password();
 
             await connection.query(`
-                INSERT INTO user(signup_date, name, surname_1, dni, email, password, active)
+                INSERT INTO user(signup_date, name, surname, dni, email, password, active)
                 VALUES ('${formatDateToDB(now)}', '${name}', '${lastName}', '${dni}', '${email}', SHA2('${password}', 512), true);
             `);
         }
@@ -187,8 +188,8 @@ async function main() {
             const now = new Date();
 
             await connection.query(`
-                INSERT INTO evaluation(company_id ,user_id, evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points)
-                VALUES ('${random(1, 10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}');
+                INSERT INTO evaluation(company_id ,user_id, evaluation_date, aspect1_points, aspect2_points, aspect3_points, aspect4_points, aspect5_points, total)
+                VALUES ('${random(1, 10)}', '${random(1, 10)}', '${formatDateToDB(now)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}', '${random(1, 10)}');
             `);
         }
 

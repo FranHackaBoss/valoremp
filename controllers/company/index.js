@@ -9,7 +9,8 @@ const editCompany = require("./editCompany");
 const createCompanyAspects = require("./createCompanyAspects");
 const editCompanyAspects = require("./editCompanyAspects");
 const deleteCompany = require("./deleteCompany");
+const validateUserCompany = require("./validateUserCompany");
 
 
 
-module.exports = { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany };
+module.exports = { listCompanies, getCompany, newCompany, validateCompany, loginCompany, addCompanyPhotos, deleteCompanyPhoto, editCompany, createCompanyAspects, editCompanyAspects, deleteCompany, validateUserCompany };
